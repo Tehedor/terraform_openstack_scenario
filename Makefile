@@ -4,8 +4,6 @@
 # =========================================================
 
 # Variables: Evita problemas de concurrencia y usa el entorno 'dev' por defecto.
-ENV ?= dev
-PLAN_FILE := tfplan_$(ENV)
 TF_COMMAND := terraform
 
 # Lista de módulos en orden de despliegue lógico (usando los prefijos numéricos)
@@ -17,9 +15,10 @@ MODULES := \
 	modules/05_database \
 	modules/06_storage
 
-.PHONY: help check all deploy-all destroy clean \
+.PHONY: help check all deploy-all destroy clean control_vars \
 	deploy-networking deploy-loadbalancer deploy-app-servers \
-	deploy-admin-server deploy-database deploy-storage
+	deploy-admin-server deploy-database deploy-storage \
+	run_nodes
 
 # ---------------------------------------------------------
 # METAS DE AYUDA Y CHEQUEO (CHECK)
@@ -128,7 +127,21 @@ validate:
 
 clean:
 	@echo "--- Limpiando archivos temporales ---"
-	rm -f $(PLAN_FILE)
 	rm -rf .terraform .terraform.lock.hcl
 	@echo "Limpieza completada."
 
+# Genera un fichero de control que concatena todas las declaraciones de variables
+# Busca todos los files `variables.tf` y los concatena en `control_vars`
+control_vars:
+	@echo "Generando control_vars concatenando variables de módulos..."
+	@find . -name "variables.tf" -not -path "./temporal_variables.tf" -exec cat {} \; > temporal_variables.tf
+	@echo "control_vars creado."
+
+run_nodes:
+	@/lab/cnvr/bin/get-openstack-tutorial.sh
+	@cd /mnt/tmp/openstack_lab-antelope_4n_classic_ovs-v04
+	@sudo vnx -f openstack_lab.xml --create
+	@sudo vnx -f openstack_lab.xml -x start-all,load-img
+	@sudo vnx_config_nat ExtNet $(ip route | grep default | cut -d" " -f 5)
+	@sudo vnx -f openstack_lab-terraform.xml --create
+	@sudo vnx -f openstack_lab-terraform.xml -x install-terraform
