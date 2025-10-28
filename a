@@ -1,0 +1,38 @@
+.
+├── Makefile
+├── main.tf
+├── modules
+│   ├── 01_networking
+│   │   ├── main.tf
+│   │   ├── output.tf
+│   │   └── variables.tf
+│   ├── 02_loadbalancer
+│   │   ├── main.tf
+│   │   ├── output.tf
+│   │   └── variables.tf
+│   ├── 03_app_servers
+│   │   ├── main.tf
+│   │   ├── output.tf
+│   │   └── variables.tf
+│   ├── 04_admin_server
+│   │   ├── main.tf
+│   │   ├── output.tf
+│   │   └── variables.tf
+│   ├── 05_database
+│   │   ├── main.tf
+│   │   ├── output.tf
+│   │   └── variables.tf
+│   ├── 06_storage
+│   │   ├── main.tf
+│   │   ├── output.tf
+│   │   └── variables.tf
+│   └── 99_template
+│       ├── network1.tf
+│       ├── variables.tf
+│       └── vm2.tf
+├── providers.tf
+├── providers_variables.tf
+├── terraform.tfvars
+└── variables.tf
+
+9 directories, 28 files
