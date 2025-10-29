@@ -63,6 +63,7 @@ deploy_all: check
 deploy-networking: check
 	@echo "🚀 Desplegando Módulo de Networking (module.networking)..."
 	@terraform apply -auto-approve -target=module.networking
+	@terraform apply -auto-approve -target=module.networking_db
 
 # 2. Balanceador de Carga (LB)
 deploy-loadbalancer: check
