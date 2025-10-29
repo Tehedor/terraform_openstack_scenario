@@ -1,3 +1,4 @@
+# Define required providers
 terraform {
   required_version = ">= 0.14.0"
   required_providers {
@@ -8,12 +9,13 @@ terraform {
   }
 }
 
+# Configure the OpenStack Provider
 provider "openstack" {
-  user_name           = var.openstack_user_name
-  password            = var.openstack_password
-  tenant_name         = var.openstack_tenant_name
-  user_domain_name    = var.openstack_user_domain_name
-  project_domain_name = var.openstack_project_domain_name
-  auth_url            = var.openstack_auth_url
-  region              = var.openstack_region
+  user_name           = "admin"
+  password            = "xxxx"
+  tenant_name         = "admin"
+  user_domain_name    = "Default"
+  project_domain_name = "Default"
+  auth_url            = "http://controller:5000/v3"
+  region              = "RegionOne"
 }

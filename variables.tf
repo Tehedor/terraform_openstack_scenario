@@ -1,38 +1,38 @@
-variable "openstack_user_name" {
-  description = "OpenStack user name"
+# variables.tf
+
+variable "image_base_name" {
+  description = "Nombre de la imagen base de Ubuntu cloud-img (ej: jammy-server-cloudimg-amd64-vnx)"
   type        = string
+  default     = "jammy-server-cloudimg-amd64-vnx"
 }
 
-variable "openstack_password" {
-  description = "OpenStack user password (sensitive)"
+variable "flavor_web" {
+  description = "Flavor de las VMs para servidores web y admin (S1, S2, S3, ADMIN)"
   type        = string
-  sensitive   = true
+  default     = "m1.small"
 }
 
-variable "openstack_tenant_name" {
-  description = "OpenStack tenant (project) name"
+variable "flavor_db" {
+  description = "Flavor de la VM de la base de datos (puede ser más grande)"
   type        = string
+  default     = "m1.medium"
 }
 
-variable "openstack_user_domain_name" {
-  description = "OpenStack user domain name"
+variable "key_pair_name" {
+  description = "Nombre del Key Pair (debe crearse previamente con CLI o Terraform)"
   type        = string
-  default     = "Default"
+  default     = "admin_key"
 }
 
-variable "openstack_project_domain_name" {
-  description = "OpenStack project domain name"
+# Redes
+variable "net1_cidr" {
+  description = "CIDR para la red Net1 (servidores web, admin, lb)"
   type        = string
-  default     = "Default"
+  default     = "10.1.2.0/24"
 }
 
-variable "openstack_auth_url" {
-  description = "Keystone auth URL"
+variable "net2_cidr" {
+  description = "CIDR para la red Net2 (bbdd, storage)"
   type        = string
-}
-
-variable "openstack_region" {
-  description = "OpenStack region"
-  type        = string
-  default     = "RegionOne"
+  default     = "10.1.3.0/24"
 }
