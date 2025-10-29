@@ -146,8 +146,10 @@ control_vars:
 # 	@sudo vnx -f openstack_lab-terraform.xml --create
 # 	@sudo vnx -f openstack_lab-terraform.xml -x install-terraform
 
-run_nodes:
+run_nodes1:
 	@/lab/cnvr/bin/get-openstack-tutorial.sh
+	
+run_nodes2:
 	@cd /mnt/tmp/openstack_lab-antelope_4n_classic_ovs-v04 && \
 	sudo vnx -f openstack_lab.xml --create
 	@sudo vnx -f openstack_lab.xml -x start-all,load-img
