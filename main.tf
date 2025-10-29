@@ -41,22 +41,22 @@ module "networking_db" {
 #   ssh_port           = 2025 # Requisito: Puerto SSH personalizado [cite: 149, 150]
 # }
 
-# Servidores Web (S1, S2, S3) - Usando una cuenta dinámica para la escalabilidad
-resource "openstack_compute_instance_v2" "web" {
-  count = 3 # Despliega 3 servidores S1, S2, S3 [cite: 41]
+# # Servidores Web (S1, S2, S3) - Usando una cuenta dinámica para la escalabilidad
+# resource "openstack_compute_instance_v2" "web" {
+#   count = 3 # Despliega 3 servidores S1, S2, S3 [cite: 41]
 
-  name     = "s${count.index + 1}"
-  image    = var.image_base_name
-  flavor   = var.flavor_web
-  key_pair = var.key_pair_name
-  network {
-    uuid = module.networking.network_id
-  }
+#   name     = "s${count.index + 1}"
+#   image    = var.image_base_name
+#   flavor   = var.flavor_web
+#   key_pair = var.key_pair_name
+#   network {
+#     uuid = module.networking.network_id
+#   }
 
-  # Configuraciones específicas
-  user_data_file     = "./cloud-init-scripts/web_init.yaml"
-  assign_floating_ip = false
-}
+#   # Configuraciones específicas
+#   user_data_file     = "./cloud-init-scripts/web_init.yaml"
+#   assign_floating_ip = false
+# }
 
 # # Servidor de Base de Datos (BBDD)
 # module "db_bbdd" {
