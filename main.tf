@@ -25,21 +25,21 @@ module "networking_db" {
 # 2. SERVIDORES
 # ---------------------------------------------------------
 
-# Servidor de Administración (ADMIN)
-module "admin_vm" {
-  source = "./modules/vm_instance"
+# # Servidor de Administración (ADMIN)
+# module "admin_vm" {
+#   source = "./modules/vm_instance"
 
-  name       = "ADMIN"
-  image      = var.image_base_name
-  flavor     = var.flavor_web
-  key_pair   = var.key_pair_name
-  network_id = module.networking.network_id # Conectado a Net1
+#   name       = "ADMIN"
+#   image      = var.image_base_name
+#   flavor     = var.flavor_web
+#   key_pair   = var.key_pair_name
+#   network_id = module.networking.network_id # Conectado a Net1
 
-  # Configuración específica de ADMIN
-  user_data_file     = "./cloud-init-scripts/admin_init.yaml"
-  assign_floating_ip = true # Requisito: ADMIN tendrá IP flotante [cite: 79]
-  ssh_port           = 2025 # Requisito: Puerto SSH personalizado [cite: 149, 150]
-}
+#   # Configuración específica de ADMIN
+#   user_data_file     = "./cloud-init-scripts/admin_init.yaml"
+#   assign_floating_ip = true # Requisito: ADMIN tendrá IP flotante [cite: 79]
+#   ssh_port           = 2025 # Requisito: Puerto SSH personalizado [cite: 149, 150]
+# }
 
 # Servidores Web (S1, S2, S3) - Usando una cuenta dinámica para la escalabilidad
 resource "openstack_compute_instance_v2" "web" {
@@ -58,49 +58,49 @@ resource "openstack_compute_instance_v2" "web" {
   assign_floating_ip = false
 }
 
-# Servidor de Base de Datos (BBDD)
-module "db_bbdd" {
-  source = "./modules/vm_instance"
+# # Servidor de Base de Datos (BBDD)
+# module "db_bbdd" {
+#   source = "./modules/vm_instance"
 
-  name       = "BBDD"
-  image      = var.image_base_name
-  flavor     = var.flavor_db
-  key_pair   = var.key_pair_name
-  network_id = module.networking_db.network_id # Conectado a Net2
+#   name       = "BBDD"
+#   image      = var.image_base_name
+#   flavor     = var.flavor_db
+#   key_pair   = var.key_pair_name
+#   network_id = module.networking_db.network_id # Conectado a Net2
 
-  # Configuraciones específicas
-  user_data_file     = "./cloud-init-scripts/db_init.yaml"
-  assign_floating_ip = false # BBDD no tiene salida a Internet/IP flotante [cite: 51]
-}
+#   # Configuraciones específicas
+#   user_data_file     = "./cloud-init-scripts/db_init.yaml"
+#   assign_floating_ip = false # BBDD no tiene salida a Internet/IP flotante [cite: 51]
+# }
 
-# ---------------------------------------------------------
-# 3. LOAD BALANCER (OCTAVIA)
-# ---------------------------------------------------------
-# Usar los recursos nativos de Octavia (LBaaS) [cite: 98]
-module "loadbalancer" {
-  source = "./modules/loadbalancer"
+# # ---------------------------------------------------------
+# # 3. LOAD BALANCER (OCTAVIA)
+# # ---------------------------------------------------------
+# # Usar los recursos nativos de Octavia (LBaaS) [cite: 98]
+# module "loadbalancer" {
+#   source = "./modules/loadbalancer"
 
-  # Conecta el LB a la red Net1
-  network_id = module.networking.network_id
-  subnet_id  = module.networking.subnet_id
+#   # Conecta el LB a la red Net1
+#   network_id = module.networking.network_id
+#   subnet_id  = module.networking.subnet_id
 
-  # Miembros del pool del LB: IDs de los 3 servidores web creados arriba
-  member_ids = openstack_compute_instance_v2.web.*.id
+#   # Miembros del pool del LB: IDs de los 3 servidores web creados arriba
+#   member_ids = openstack_compute_instance_v2.web.*.id
 
-  # El LB necesita una IP flotante para que los clientes accedan [cite: 88]
-  assign_floating_ip = true
-}
+#   # El LB necesita una IP flotante para que los clientes accedan [cite: 88]
+#   assign_floating_ip = true
+# }
 
-# ---------------------------------------------------------
-# 4. FIREWALL (FWaaS) y GRUPOS DE SEGURIDAD
-# ---------------------------------------------------------
-# Se asume que el router que conecta Net1 a ExtNet se creará aquí o en el módulo 'security'.
-# Por simplicidad, se puede implementar el firewall como un Security Group "open" en este nivel [cite: 120]
-# El módulo 'security' debería gestionar el FWaaS completo (reglas y políticas)[cite: 103].
-module "security" {
-  source = "./modules/security"
-  # Le pasamos la ID de la red para asociar el router y el FWaaS
-  network_id = module.networking.network_id
-  admin_ip   = module.admin_vm.internal_ip     # Necesario para la regla SSH 2025 [cite: 107]
-  lb_ip      = module.loadbalancer.internal_ip # Necesario para la regla HTTP 80 [cite: 108]
-}
+# # ---------------------------------------------------------
+# # 4. FIREWALL (FWaaS) y GRUPOS DE SEGURIDAD
+# # ---------------------------------------------------------
+# # Se asume que el router que conecta Net1 a ExtNet se creará aquí o en el módulo 'security'.
+# # Por simplicidad, se puede implementar el firewall como un Security Group "open" en este nivel [cite: 120]
+# # El módulo 'security' debería gestionar el FWaaS completo (reglas y políticas)[cite: 103].
+# module "security" {
+#   source = "./modules/security"
+#   # Le pasamos la ID de la red para asociar el router y el FWaaS
+#   network_id = module.networking.network_id
+#   admin_ip   = module.admin_vm.internal_ip     # Necesario para la regla SSH 2025 [cite: 107]
+#   lb_ip      = module.loadbalancer.internal_ip # Necesario para la regla HTTP 80 [cite: 108]
+# }
