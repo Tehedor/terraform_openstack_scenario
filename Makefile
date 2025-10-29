@@ -1,8 +1,31 @@
-.PHONY: fmt validate init clean check destroy_all deploy_all
+.PHONY: help fmt validate init clean check destroy_all deploy_all
 
 fmt:
 	@echo "📝 Formateando código Terraform..."
 	@terraform fmt -recursive
+
+# Show a helpful list of make targets and usage
+help:
+	@echo "Makefile - lista de objetivos disponibles:" \
+		&& echo "  help                 - Mostrar esta ayuda" \
+		&& echo "  fmt                  - Formatear código Terraform (terraform fmt -recursive)" \
+		&& echo "  validate             - Validar la configuración Terraform (terraform validate)" \
+		&& echo "  init                 - Inicializar Terraform (terraform init)" \
+		&& echo "  clean                - Limpiar archivos temporales (.terraform, lock)" \
+		&& echo "  check                - init + fmt + validate" \
+		&& echo "  deploy_all           - Ejecutar check y aplicar toda la infraestructura" \
+		&& echo "  destroy_all          - Destruir toda la infraestructura (terraform destroy)" \
+		&& echo "  deploy-networking    - Desplegar solo el módulo de networking (module.networking)" \
+		&& echo "  deploy-loadbalancer  - Desplegar solo el módulo del load balancer" \
+		&& echo "  deploy-admin         - Desplegar solo el servidor ADMIN (module.admin_vm)" \
+		&& echo "  deploy-webservers    - Desplegar servidores web S1,S2,S3" \
+		&& echo "  deploy-db            - Desplegar solo la base de datos (module.db_bbdd)" \
+		&& echo "  deploy-storage       - Desplegar módulo de almacenamiento (si existe)" \
+		&& echo "  destroy-db           - Destruir solo la base de datos" \
+		&& echo "  run_nodes1           - Script personalizado (get-openstack-tutorial.sh)" \
+		&& echo "  run_nodes2           - Crear/arrancar laboratorio local VNX (scripts locales)" \
+		&& echo "  destroy_nodes        - Destruir nodos del laboratorio VNX" \
+		&& echo "  cp_shared            - Copiar el repo al shared del laboratorio VNX"
 
 validate:
 	@echo "✅ Validando configuración Terraform..."
@@ -92,6 +115,10 @@ run_nodes2:
 	sudo vnx -f openstack_lab-terraform.xml -x install-terraform
 	@echo "run_nodes2 completado."
 
+run_problem_terraform:
+	@echo "Iniciando resolución de problemas de Terraform en el laboratorio..."
+	@cd /mnt/tmp/openstack_lab-antelope_4n_classic_ovs-v04 && \
+	sudo vnx -f openstack_lab-terraform.xml -x install-terraform
 
 destroy_nodes:
 	@cd /mnt/tmp/openstack_lab-antelope_4n_classic_ovs-v04 && \

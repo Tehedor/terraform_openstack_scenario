@@ -1,3 +1,12 @@
+terraform {
+  required_providers {
+    openstack = {
+      source  = "terraform-provider-openstack/openstack"
+      version = "~> 1.53.0"
+    }
+  }
+}
+
 resource "openstack_networking_network_v2" "net" {
   name           = var.network_name
   admin_state_up = "true"
