@@ -75,3 +75,29 @@ deploy-storage: check
 destroy-db: 
 	@echo "🗑️  Destruyendo solo el Servidor de Base de Datos..."
 	@terraform destroy -auto-approve -target=module.db_bbdd
+
+
+
+
+run_nodes1:
+	@/lab/cnvr/bin/get-openstack-tutorial.sh
+
+run_nodes2:
+	@echo "Iniciando creación y arranque del laboratorio (run_nodes2)..."
+	@cd /mnt/tmp/openstack_lab-antelope_4n_classic_ovs-v04 && \
+	sudo vnx -f openstack_lab.xml --create && \
+	sudo vnx -f openstack_lab.xml -x start-all,load-img && \
+	sudo vnx_config_nat ExtNet $$(ip route | grep default | cut -d" " -f 5) && \
+	sudo vnx -f openstack_lab-terraform.xml --create && \
+	sudo vnx -f openstack_lab-terraform.xml -x install-terraform
+	@echo "run_nodes2 completado."
+
+
+destroy_nodes:
+	@cd /mnt/tmp/openstack_lab-antelope_4n_classic_ovs-v04 && \
+	sudo vnx -f openstack_lab-terraform.xml --destroy
+	@cd /mnt/tmp/openstack_lab-antelope_4n_classic_ovs-v04 && \
+	sudo vnx -f openstack_lab.xml --destroy
+
+cp_shared:
+	@cp -r ../terraform_openstack_scenario/. /mnt/tmp/openstack_lab-antelope_4n_classic_ovs-v04/shared/
