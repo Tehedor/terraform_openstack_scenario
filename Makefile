@@ -165,3 +165,6 @@ destroy_nodes:
 	sudo vnx -f openstack_lab-terraform.xml --destroy
 	@cd /mnt/tmp/openstack_lab-antelope_4n_classic_ovs-v04 && \
 	sudo vnx -f openstack_lab.xml --destroy
+
+cp_shared:
+	@cp -r ../terraform_openstack_scenario/. /mnt/tmp/openstack_lab-antelope_4n_classic_ovs-v04/shared/
