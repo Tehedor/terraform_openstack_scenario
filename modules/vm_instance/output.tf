@@ -3,14 +3,14 @@
 # ID de la instancia, necesaria para el Load Balancer
 output "instance_id" {
   description = "La ID única de la instancia VM"
-  value       = openstack_compute_instance_v2.vm.id
+  value       = openstack_compute_instance_v2.vm[*].id
 }
 
 # Dirección IP interna (fixed_ip)
 output "internal_ip" {
   description = "Dirección IP interna de la VM (fixed_ip_v4)"
   # Asumimos una sola red [0]
-  value = openstack_compute_instance_v2.vm.network[0].fixed_ip_v4
+  value = [for n in openstack_compute_instance_v2.vm : n.network[0].fixed_ip_v4]
 }
 
 # Dirección IP flotante (si existe)

@@ -14,17 +14,22 @@ resource "openstack_compute_instance_v2" "vm" {
   image_name      = var.image
   flavor_name     = var.flavor
   key_pair        = var.key_pair
-  security_groups = var.security_group_ids
+  security_groups = var.security_groups
+
+  # INYECCIÓN DINÁMICA DE CLOUD-INIT
+  # La función file() lee el contenido del script yaml pasado por la variable user_data_file
+  user_data = file(var.user_data_file)
 
   # Conexión a la red interna (la ID viene como variable de entrada)
   network {
     uuid = var.network_id
   }
-
-  # INYECCIÓN DINÁMICA DE CLOUD-INIT
-  # La función file() lee el contenido del script yaml pasado por la variable user_data_file
-  user_data = file(var.user_data_file)
+  count = var.asign_multiple_network ? 1 : 0
+  network {
+    uuid = var.second_network_id
+  }
 }
+
 
 # ---------------------------------------------------------
 # 2. LÓGICA DE IP FLOTANTE (CONDICIONAL)
@@ -41,5 +46,5 @@ resource "openstack_networking_floatingip_v2" "fip" {
 resource "openstack_compute_floatingip_associate_v2" "fip_assoc" {
   count       = var.assign_floating_ip ? 1 : 0
   floating_ip = openstack_networking_floatingip_v2.fip[0].address
-  instance_id = openstack_compute_instance_v2.vm.id
+  instance_id = openstack_compute_instance_v2.vm[0].id
 }

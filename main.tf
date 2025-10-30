@@ -13,7 +13,7 @@ module "networking" {
 }
 
 # Módulo para crear Net2 (DB/Storage)
-module "networking_db" {
+module "networking2" {
   source = "./modules/network"
 
   network_name = "Net2"
@@ -25,53 +25,61 @@ module "networking_db" {
 # 2. SERVIDORES
 # ---------------------------------------------------------
 
-# # Servidor de Administración (ADMIN)
-# module "admin_vm" {
-#   source = "./modules/vm_instance"
+# Servidor de Administración (ADMIN)
+module "admin_vm" {
+  source = "./modules/vm_instance"
 
-#   name       = "ADMIN"
-#   image      = var.image_base_name
-#   flavor     = var.flavor_web
-#   key_pair   = var.key_pair_name
-#   network_id = module.networking.network_id # Conectado a Net1
+  name            = "ADMIN"
+  image           = var.image_base_name
+  flavor          = var.flavor_web
+  key_pair        = var.key_pair_name
+  security_groups = [openstack_networking_secgroup_v2.my_security_group.name]
 
-#   # Configuración específica de ADMIN
-#   user_data_file     = "./cloud-init-scripts/admin_init.yaml"
-#   assign_floating_ip = true # Requisito: ADMIN tendrá IP flotante [cite: 79]
-#   ssh_port           = 2025 # Requisito: Puerto SSH personalizado [cite: 149, 150]
-# }
+  network_id             = module.networking.network_id # Conectado a Net1
+  asign_multiple_network = true
+  second_network_id      = module.networking2.network_id # Conectado a Net2
 
-# # Servidores Web (S1, S2, S3) - Usando una cuenta dinámica para la escalabilidad
-# resource "openstack_compute_instance_v2" "web" {
-#   count = 3 # Despliega 3 servidores S1, S2, S3 [cite: 41]
+  # Configuración específica de ADMIN
+  user_data_file     = "./cloud-init-scripts/admin_init.yaml"
+  assign_floating_ip = true # Requisito: ADMIN tendrá IP flotante [cite: 79]
+  ssh_port           = 2025 # Requisito: Puerto SSH personalizado [cite: 149, 150]
+}
 
-#   name     = "s${count.index + 1}"
-#   image    = var.image_base_name
-#   flavor   = var.flavor_web
-#   key_pair = var.key_pair_name
-#   network {
-#     uuid = module.networking.network_id
-#   }
+# Servidores Web (S1, S2, S3) - Usando una cuenta dinámica para la escalabilidad
+module "web" {
+  source = "./modules/vm_instance"
 
-#   # Configuraciones específicas
-#   user_data_file     = "./cloud-init-scripts/web_init.yaml"
-#   assign_floating_ip = false
-# }
+  count = 3 # Despliega 3 servidores S1, S2, S3 [cite: 41]
 
-# # Servidor de Base de Datos (BBDD)
-# module "db_bbdd" {
-#   source = "./modules/vm_instance"
+  name     = "s${count.index + 1}"
+  image    = var.image_base_name
+  flavor   = var.flavor_web
+  key_pair = var.key_pair_name
 
-#   name       = "BBDD"
-#   image      = var.image_base_name
-#   flavor     = var.flavor_db
-#   key_pair   = var.key_pair_name
-#   network_id = module.networking_db.network_id # Conectado a Net2
+  network_id             = module.networking.network_id # Conectado a Net1
+  asign_multiple_network = true
+  second_network_id      = module.networking2.network_id # Conectado a Net2
 
-#   # Configuraciones específicas
-#   user_data_file     = "./cloud-init-scripts/db_init.yaml"
-#   assign_floating_ip = false # BBDD no tiene salida a Internet/IP flotante [cite: 51]
-# }
+  # Configuraciones específicas
+  user_data_file     = "./cloud-init-scripts/web_init.yaml"
+  assign_floating_ip = false
+}
+
+# Servidor de Base de Datos (BBDD)
+module "db_bbdd" {
+  source = "./modules/vm_instance"
+
+  name     = "BBDD"
+  image    = var.image_base_name
+  flavor   = var.flavor_db
+  key_pair = var.key_pair_name
+
+  network_id = module.networking2.network_id # Conectado a Net2
+
+  # Configuraciones específicas
+  user_data_file     = "./cloud-init-scripts/db_init.yaml"
+  assign_floating_ip = false # BBDD no tiene salida a Internet/IP flotante [cite: 51]
+}
 
 # # ---------------------------------------------------------
 # # 3. LOAD BALANCER (OCTAVIA)
