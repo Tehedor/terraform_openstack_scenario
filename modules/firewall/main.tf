@@ -1,3 +1,15 @@
+terraform {
+  # Aquí se declaran los proveedores requeridos para este módulo.
+  # `openstack` es el proveedor que permite a Terraform interactuar con
+  # una nube OpenStack (crear redes, subredes, instancias, etc.).
+  required_providers {
+    openstack = {
+      source  = "terraform-provider-openstack/openstack"
+      version = "~> 1.53.0" # Restringe la versión del proveedor a la serie 1.53.x
+    }
+  }
+}
+
 # Creates a firewall rule to allow SSH access on port 2020 from any IP address.
 resource "openstack_fw_rule_v2" "ssh_access" {
   name                   = var.name
