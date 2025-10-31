@@ -1,0 +1,52 @@
+# Creates a firewall rule to allow SSH access on port 2020 from any IP address.
+resource "openstack_fw_rule_v2" "ssh_access" {
+  name                   = var.name
+  protocol               = var.protocol
+  action                 = var.ssh_access
+  destination_ip_address = var.destination_ip_address
+  destination_port       = var.destination_port
+  source_ip_address      = "0.0.0.0/0"
+}
+
+# Creates a firewall rule to allow HTTP access on port 80 from any IP address.
+resource "openstack_fw_rule_v2" "http_access" {
+  name                   = var.rule1_name
+  protocol               = var.rule1_protocol
+  action                 = var.rule_1_action
+  destination_ip_address = var.rule1_destination_ip_address
+  destination_port       = var.rule1_destination_port
+  source_ip_address      = var.rule1_source_ip_address
+}
+
+# Creates a firewall rule to allow internal access for any protocol from any IP address.
+resource "openstack_fw_rule_v2" "internal_access" {
+  name              = var.rule2_name
+  protocol          = var.rule2_protocol
+  action            = var.rule2_action
+  source_ip_address = var.rule2_source_ip_address
+}
+
+# Creates a firewall policy for ingress traffic.
+resource "openstack_fw_policy_v2" "ingress_policy" {
+  name = var.policy_ingress_name
+  rules = [
+    openstack_fw_rule_v2.ssh_access.id,
+    openstack_fw_rule_v2.http_access.id,
+  ]
+}
+
+# Creates a firewall policy for egress traffic.
+resource "openstack_fw_policy_v2" "egress_policy" {
+  name  = var.policy_egress_name
+  rules = [openstack_fw_rule_v2.internal_access.id]
+}
+
+# Creates a firewall group and associates it with the ingress and egress firewall policies.
+resource "openstack_fw_group_v2" "firewall_group" {
+  name = var.group_name
+
+  ingress_firewall_policy_id = openstack_fw_policy_v2.ingress_policy.id
+  egress_firewall_policy_id  = openstack_fw_policy_v2.egress_policy.id
+
+  ports = [var.router_port_id]
+}

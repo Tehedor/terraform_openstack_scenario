@@ -36,3 +36,15 @@ variable "net2_cidr" {
   type        = string
   default     = "10.1.3.0/24"
 }
+
+variable "lb_name" {
+  description = "Nombre del Load Balancer"
+  type        = string
+  default     = "LB"
+}
+
+variable "ext_network" {
+  description = "Nombre de la red externa (ExtNet) para acceso a Internet"
+  type        = string
+  default     = "ExtNet"
+}

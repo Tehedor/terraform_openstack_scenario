@@ -21,6 +21,17 @@ module "networking2" {
   cidr         = var.net2_cidr
 }
 
+# Módulo para crear el router que conecta Net1 a ExtNet
+module "router" {
+  source = "./modules/router"
+
+  router_name = "r0"
+  network_id  = module.networking.network_id # Conectar a Net1
+  subnet_id   = module.networking.subnet_id  # Conectar a la subred
+  ext_network = var.ext_network
+  gateway     = cidrhost(var.net1_cidr, 1) # Asignar la IP de gateway de Net1
+}
+
 # ---------------------------------------------------------
 # 2. SERVIDORES
 # ---------------------------------------------------------
@@ -84,31 +95,54 @@ module "db_bbdd" {
 # # ---------------------------------------------------------
 # # 3. LOAD BALANCER (OCTAVIA)
 # # ---------------------------------------------------------
-# # Usar los recursos nativos de Octavia (LBaaS) [cite: 98]
-# module "loadbalancer" {
-#   source = "./modules/loadbalancer"
+# Usar los recursos nativos de Octavia (LBaaS) [cite: 98]
+module "loadbalancer" {
+  source = "./modules/loadbalancer"
 
-#   # Conecta el LB a la red Net1
-#   network_id = module.networking.network_id
-#   subnet_id  = module.networking.subnet_id
-
-#   # Miembros del pool del LB: IDs de los 3 servidores web creados arriba
-#   member_ids = openstack_compute_instance_v2.web.*.id
-
-#   # El LB necesita una IP flotante para que los clientes accedan [cite: 88]
-#   assign_floating_ip = true
-# }
+  lb_name = var.lb_name
+  # Conecta el LB a la red Net1
+  network_id    = module.networking.network_id
+  subnet_id     = module.networking.subnet_id
+  protocol      = "TCP"
+  protocol_port = 80
+  lb_method     = "ROUND_ROBIN"
+  num_servers   = 3
+  server_ips    = flatten(module.web[*].internal_ip)
+}
 
 # # ---------------------------------------------------------
 # # 4. FIREWALL (FWaaS) y GRUPOS DE SEGURIDAD
 # # ---------------------------------------------------------
-# # Se asume que el router que conecta Net1 a ExtNet se creará aquí o en el módulo 'security'.
-# # Por simplicidad, se puede implementar el firewall como un Security Group "open" en este nivel [cite: 120]
-# # El módulo 'security' debería gestionar el FWaaS completo (reglas y políticas)[cite: 103].
-# module "security" {
-#   source = "./modules/security"
-#   # Le pasamos la ID de la red para asociar el router y el FWaaS
-#   network_id = module.networking.network_id
-#   admin_ip   = module.admin_vm.internal_ip     # Necesario para la regla SSH 2025 [cite: 107]
-#   lb_ip      = module.loadbalancer.internal_ip # Necesario para la regla HTTP 80 [cite: 108]
-# }
+# Se asume que el router que conecta Net1 a ExtNet se creará aquí o en el módulo 'security'.
+# Por simplicidad, se puede implementar el firewall como un Security Group "open" en este nivel [cite: 120]
+# El módulo 'security' debería gestionar el FWaaS completo (reglas y políticas)[cite: 103].
+module "security" {
+  source = "./modules/security"
+  # Le pasamos la ID de la red para asociar el router y el FWaaS
+  name                   = "ssh_access"
+  protocol               = "tcp"
+  ssh_access             = "allow"
+  destination_ip_address = module.vm_instance.admin_internal_ip
+  destination_port       = "2020"
+  source_ip_address      = "0.0.0.0/0"
+
+  rule1_name                   = "http_access"
+  rule1_protocol               = "tcp"
+  rule1_action                 = "allow"
+  rule1_destination_ip_address = module.loadbalancer.loadbalancer_vip_address
+  rule1_destination_port       = "80"
+  rule1_source_ip_address      = "0.0.0.0/0"
+
+  rule2_name              = "internal_access"
+  rule2_protocol          = "any"
+  rule2_action            = "allow"
+  rule2_source_ip_address = "0.0.0.0/0"
+
+  policy_ingress_name = "ingress_policy"
+
+  policy_egress_name = "egress_policy"
+
+  router_port_id = module.router.router_port_id
+
+  group_name = "my_firewall_group"
+}
