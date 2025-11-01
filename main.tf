@@ -116,13 +116,13 @@ module "loadbalancer" {
 # Se asume que el router que conecta Net1 a ExtNet se creará aquí o en el módulo 'security'.
 # Por simplicidad, se puede implementar el firewall como un Security Group "open" en este nivel [cite: 120]
 # El módulo 'security' debería gestionar el FWaaS completo (reglas y políticas)[cite: 103].
-module "security" {
-  source = "./modules/security"
+module "firewall" {
+  source = "./modules/firewall"
   # Le pasamos la ID de la red para asociar el router y el FWaaS
   name                   = "ssh_access"
   protocol               = "tcp"
   ssh_access             = "allow"
-  destination_ip_address = module.vm_instance.admin_internal_ip
+  destination_ip_address = module.vm_instance.internal_ip
   destination_port       = "2020"
   source_ip_address      = "0.0.0.0/0"
 

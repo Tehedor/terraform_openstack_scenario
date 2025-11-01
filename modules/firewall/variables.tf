@@ -60,11 +60,6 @@ variable "rule1_source_ip_address" {
   type        = string
 }
 
-variable "rule1_destination_ip_address" {
-  description = "Dirección IP destino para la regla HTTP"
-  type        = string
-}
-
 # Variables para la regla de acceso interno
 variable "rule2_name" {
   description = "Nombre de la regla de firewall para acceso interno"
