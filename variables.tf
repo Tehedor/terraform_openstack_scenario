@@ -9,7 +9,7 @@ variable "image_base_name" {
 variable "flavor_web" {
   description = "Flavor de las VMs para servidores web y admin (S1, S2, S3, ADMIN)"
   type        = string
-  default     = "m1.small"
+  default     = "m1.smaller"
 }
 
 variable "flavor_db" {

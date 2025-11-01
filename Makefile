@@ -68,31 +68,35 @@ deploy-networking: check
 	@echo "🚀 Desplegando Módulo de router (module.router)..."
 	@terraform apply -auto-approve -target=module.router
 
-# 2. Balanceador de Carga (LB)
-deploy-loadbalancer: check
-	@echo "🚀 Desplegando Módulo de Load Balancer (module.loadbalancer)..."
-	@terraform apply -auto-approve -target=module.loadbalancer
-
-# 3. Servidor de Administración (ADMIN)
+# 2. Servidor de Administración (ADMIN)
 deploy-admin: check
 	@echo "🚀 Desplegando Servidor ADMIN (module.admin_vm)..."
 	@terraform apply -auto-approve -target=module.admin_vm
 
-# 4. Servidores Web (S1, S2, S3)
+# 3. Servidores Web (S1, S2, S3)
 deploy-webservers: check
 	@echo "🚀 Desplegando Servidores Web (module.web_s1, module.web_s2, module.web_s3)..."
-	@terraform apply -auto-approve -target=module.web_s1 -target=module.web_s2 -target=module.web_s3
+	@terraform apply -auto-approve -target=module.web
 
-# 5. Base de Datos (BBDD)
+# 4. Base de Datos (BBDD)
 deploy-db: check
 	@echo "🚀 Desplegando Base de Datos (module.db_bbdd)..."
 	@terraform apply -auto-approve -target=module.db_bbdd
 
-# 6. Almacenamiento (Opcional)
+# 5. Almacenamiento (Opcional)
 deploy-storage: check
 	@echo "🚀 Desplegando Módulo de Almacenamiento (module.storage)..."
 	@terraform apply -auto-approve -target=module.storage
 
+# 6. Balanceador de Carga (LB)
+deploy-loadbalancer: check
+	@echo "🚀 Desplegando Módulo de Load Balancer (module.loadbalancer)..."
+	@terraform apply -auto-approve -target=module.loadbalancer
+
+# 7. Balanceador de Carga (LB)
+deploy-firewall: check
+	@echo "🚀 Desplegando Módulo de Firewall (module.firewall)..."
+	@terraform apply -auto-approve -target=module.firewall
 # ---------------------------------------------------------
 # DESTRUCCIÓN ESPECÍFICA
 # ---------------------------------------------------------

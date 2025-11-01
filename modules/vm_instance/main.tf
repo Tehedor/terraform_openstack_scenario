@@ -7,13 +7,22 @@ terraform {
   }
 }
 # ---------------------------------------------------------
+# 0. RECURSO DE KEYPAIRS
+# # ---------------------------------------------------------
+# resource "openstack_compute_keypair_v2" "key{
+#   name            = var.key_pair
+#   public_key = file()
+# }"
+
+
+# ---------------------------------------------------------
 # 1. RECURSO DE MÁQUINA VIRTUAL
 # ---------------------------------------------------------
 resource "openstack_compute_instance_v2" "vm" {
   name            = var.name
   image_name      = var.image
   flavor_name     = var.flavor
-  key_pair        = var.key_pair
+  # key_pair        = openstack_compute_keypair_v2.
   security_groups = var.security_groups
 
   # INYECCIÓN DINÁMICA DE CLOUD-INIT
@@ -24,10 +33,14 @@ resource "openstack_compute_instance_v2" "vm" {
   network {
     uuid = var.network_id
   }
-  count = var.asign_multiple_network ? 1 : 0
-  network {
-    uuid = var.second_network_id
-  }
+
+ #Añade la segunda red dinámicamente solo si es necesario
+  dynamic "network"{
+    for_each = var.asign_multiple_network ?[var.second_network_id] : []
+    content{
+      uuid = network.value
+    } 
+  } 
 }
 
 
@@ -46,5 +59,5 @@ resource "openstack_networking_floatingip_v2" "fip" {
 resource "openstack_compute_floatingip_associate_v2" "fip_assoc" {
   count       = var.assign_floating_ip ? 1 : 0
   floating_ip = openstack_networking_floatingip_v2.fip[0].address
-  instance_id = openstack_compute_instance_v2.vm[0].id
+  instance_id = openstack_compute_instance_v2.vm.id
 }
