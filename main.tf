@@ -115,36 +115,36 @@ module "loadbalancer" {
 # # ---------------------------------------------------------
 # # 4. FIREWALL (FWaaS) y GRUPOS DE SEGURIDAD
 # # ---------------------------------------------------------
-# # Se asume que el router que conecta Net1 a ExtNet se creará aquí o en el módulo 'security'.
-# # Por simplicidad, se puede implementar el firewall como un Security Group "open" en este nivel [cite: 120]
-# # El módulo 'security' debería gestionar el FWaaS completo (reglas y políticas)[cite: 103].
-# module "firewall" {
-#   source = "./modules/firewall"
-#   # Le pasamos la ID de la red para asociar el router y el FWaaS
-#   name                   = "ssh_access"
-#   protocol               = "tcp"
-#   ssh_access             = "allow"
-#   destination_ip_address = module.vm_instance.internal_ip
-#   destination_port       = "2020"
-#   source_ip_address      = "0.0.0.0/0"
+# Se asume que el router que conecta Net1 a ExtNet se creará aquí o en el módulo 'security'.
+# Por simplicidad, se puede implementar el firewall como un Security Group "open" en este nivel [cite: 120]
+# El módulo 'security' debería gestionar el FWaaS completo (reglas y políticas)[cite: 103].
+module "firewall" {
+  source = "./modules/firewall"
+  # Le pasamos la ID de la red para asociar el router y el FWaaS
+  name                   = "ssh_access"
+  protocol               = "tcp"
+  ssh_access             = "allow"
+  destination_ip_address = module.admin_vm.internal_ip
+  destination_port       = "2020"
+  source_ip_address      = "0.0.0.0/0"
 
-#   rule1_name                   = "http_access"
-#   rule1_protocol               = "tcp"
-#   rule1_action                 = "allow"
-#   rule1_destination_ip_address = module.loadbalancer.loadbalancer_vip_address
-#   rule1_destination_port       = "80"
-#   rule1_source_ip_address      = "0.0.0.0/0"
+  rule1_name                   = "http_access"
+  rule1_protocol               = "tcp"
+  rule1_action                 = "allow"
+  rule1_destination_ip_address = module.loadbalancer.loadbalancer_vip_address
+  rule1_destination_port       = "80"
+  rule1_source_ip_address      = "0.0.0.0/0"
 
-#   rule2_name              = "internal_access"
-#   rule2_protocol          = "any"
-#   rule2_action            = "allow"
-#   rule2_source_ip_address = "0.0.0.0/0"
+  rule2_name              = "internal_access"
+  rule2_protocol          = "any"
+  rule2_action            = "allow"
+  rule2_source_ip_address = "0.0.0.0/0"
 
-#   policy_ingress_name = "ingress_policy"
+  policy_ingress_name = "ingress_policy"
 
-#   policy_egress_name = "egress_policy"
+  policy_egress_name = "egress_policy"
 
-#   router_port_id = module.router.router_port_id
+  router_port_id = module.router.router_port_id
 
-#   group_name = "my_firewall_group"
-# }
+  group_name = "my_firewall_group"
+}

@@ -24,7 +24,7 @@ resource "openstack_fw_rule_v2" "ssh_access" {
 resource "openstack_fw_rule_v2" "http_access" {
   name                   = var.rule1_name
   protocol               = var.rule1_protocol
-  action                 = var.rule_1_action
+  action                 = var.rule1_action
   destination_ip_address = var.rule1_destination_ip_address
   destination_port       = var.rule1_destination_port
   source_ip_address      = var.rule1_source_ip_address
