@@ -38,19 +38,25 @@ resource "openstack_fw_rule_v2" "internal_access" {
   source_ip_address = var.rule2_source_ip_address
 }
 
-# Creates a firewall policy for ingress traffic.
-resource "openstack_fw_policy_v2" "ingress_policy" {
-  name = var.policy_ingress_name
-  rules = [
-    openstack_fw_rule_v2.ssh_access.id,
-    openstack_fw_rule_v2.http_access.id,
-  ]
+resource "openstack_networking_secgroup_v2" "my_security_group" {
+ name = "open"
+ description = "Grupo de Seguridad para permitir todo el trafico"
+ delete_default_rules = true
 }
 
-# Creates a firewall policy for egress traffic.
-resource "openstack_fw_policy_v2" "egress_policy" {
-  name  = var.policy_egress_name
-  rules = [openstack_fw_rule_v2.internal_access.id]
+resource "openstack_networking_secgroup_rule_v2" "security_group_rule_ingress"{
+ direction = "ingress"
+ ethertype = "IPv4"
+ protocol = "tcp"
+ remote_ip_prefix = "0.0.0.0/0"
+ security_group_id = openstack_networking_secgroup_v2.my_security_group.id
+}
+resource "openstack_networking_secgroup_rule_v2" "security_group_rule_engress"{
+ direction = "egress"
+ ethertype = "IPv4"
+ protocol = "tcp"
+ remote_ip_prefix = "0.0.0.0/0"
+ security_group_id = openstack_networking_secgroup_v2.my_security_group.id
 }
 
 # Creates a firewall group and associates it with the ingress and egress firewall policies.
