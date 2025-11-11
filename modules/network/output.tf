@@ -5,15 +5,16 @@ output "network_id" {
   value       = openstack_networking_network_v2.net.id
 }
 
+output "subnet_id" {
+  description = "ID de la subred creada, necesaria para el Load Balancer"
+  value       = openstack_networking_subnet_v2.subnet.id
+}
+
 output "network_name" {
   description = "Nombre de la red"
   value       = openstack_networking_network_v2.net.name
 }
 
-output "subnet_id" {
-  description = "ID de la subred creada, necesaria para el Load Balancer"
-  value       = openstack_networking_subnet_v2.subnet.id
-}
 
 output "cidr_block" {
   description = "Bloque CIDR de la subred"

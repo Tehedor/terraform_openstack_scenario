@@ -37,24 +37,24 @@ module "router" {
 # ---------------------------------------------------------
 
 # Servidor de Administración (ADMIN)
-module "admin_vm" {
-  source = "./modules/vm_instance"
+# module "admin_vm" {
+#   source = "./modules/vm_instance"
 
-  name            = "ADMIN"
-  image           = var.image_base_name
-  flavor          = var.flavor_web
-  key_pair        = var.key_pair_name
-  security_groups = [openstack_networking_secgroup_v2.my_security_group.name]
+#   name            = "ADMIN"
+#   image           = var.image_base_name
+#   flavor          = var.flavor_web
+#   key_pair        = var.key_pair_name
+#   security_groups = [openstack_networking_secgroup_v2.my_security_group.name]
 
-  network_id             = module.networking.network_id # Conectado a Net1
-  asign_multiple_network = true
-  second_network_id      = module.networking2.network_id # Conectado a Net2
+#   network_id             = module.networking.network_id # Conectado a Net1
+#   asign_multiple_network = true
+#   second_network_id      = module.networking2.network_id # Conectado a Net2
 
-  # Configuración específica de ADMIN
-  # user_data_file     = "./cloud-init-scripts/admin_init.yaml"
-  assign_floating_ip = true # Requisito: ADMIN tendrá IP flotante [cite: 79]
-  ssh_port           = 2025 # Requisito: Puerto SSH personalizado [cite: 149, 150]
-}
+#   # Configuración específica de ADMIN
+#   # user_data_file     = "./cloud-init-scripts/admin_init.yaml"
+#   assign_floating_ip = true # Requisito: ADMIN tendrá IP flotante [cite: 79]
+#   ssh_port           = 2025 # Requisito: Puerto SSH personalizado [cite: 149, 150]
+# }
 
 # Servidores Web (S1, S2, S3) - Usando una cuenta dinámica para la escalabilidad
 # module "web" {
@@ -98,44 +98,51 @@ module "web" {
   db_user        = var.db_user
   db_pass        = var.db_pass
   db_name        = var.db_name
+
+  depends_on = [
+    module.networking,
+    module.networking2,
+    module.router
+  ]
+
 }
 
 
 # Servidor de Base de Datos (BBDD)
-module "db_bbdd" {
-  source = "./modules/vm_instance"
+# module "db_bbdd" {
+#   source = "./modules/vm_instance"
 
-  name     = "BBDD"
-  image    = var.image_base_name
-  flavor   = var.flavor_web
-  key_pair = var.key_pair_name
+#   name     = "BBDD"
+#   image    = var.image_base_name
+#   flavor   = var.flavor_web
+#   key_pair = var.key_pair_name
 
-  network_id             = module.networking2.network_id # Conectado a Net2
-  asign_multiple_network = false
+#   network_id             = module.networking2.network_id # Conectado a Net2
+#   asign_multiple_network = false
 
 
-  # Configuraciones específicas
-  user_data_file     = "./cloud-init-scripts/db_init.yaml"
-  assign_floating_ip = false # BBDD no tiene salida a Internet/IP flotante [cite: 51]
-}
+#   # Configuraciones específicas
+#   user_data_file     = "./cloud-init-scripts/db_init.yaml"
+#   assign_floating_ip = false # BBDD no tiene salida a Internet/IP flotante [cite: 51]
+# }
 
 # # ---------------------------------------------------------
 # # 3. LOAD BALANCER (OCTAVIA)
 # # ---------------------------------------------------------
 # Usar los recursos nativos de Octavia (LBaaS) [cite: 98]
-module "loadbalancer" {
-  source = "./modules/loadbalancer"
+# module "loadbalancer" {
+#   source = "./modules/loadbalancer"
 
-  lb_name = var.lb_name
-  # Conecta el LB a la red Net1
-  network_id    = module.networking.network_id
-  subnet_id     = module.networking.subnet_id
-  protocol      = "TCP"
-  protocol_port = 80
-  lb_method     = "ROUND_ROBIN"
-  num_servers   = 3
-  server_ips    = flatten(module.web[*].internal_ip)
-}
+#   lb_name = var.lb_name
+#   # Conecta el LB a la red Net1
+#   network_id    = module.networking.network_id
+#   subnet_id     = module.networking.subnet_id
+#   protocol      = "TCP"
+#   protocol_port = 80
+#   lb_method     = "ROUND_ROBIN"
+#   num_servers   = 3
+#   server_ips    = flatten(module.web[*].internal_ip)
+# }
 
 # # ---------------------------------------------------------
 # # 4. FIREWALL (FWaaS) y GRUPOS DE SEGURIDAD
@@ -143,33 +150,33 @@ module "loadbalancer" {
 # Se asume que el router que conecta Net1 a ExtNet se creará aquí o en el módulo 'security'.
 # Por simplicidad, se puede implementar el firewall como un Security Group "open" en este nivel [cite: 120]
 # El módulo 'security' debería gestionar el FWaaS completo (reglas y políticas)[cite: 103].
-module "firewall" {
-  source = "./modules/firewall"
-  # Le pasamos la ID de la red para asociar el router y el FWaaS
-  name                   = "ssh_access"
-  protocol               = "tcp"
-  ssh_access             = "allow"
-  destination_ip_address = module.admin_vm.internal_ip
-  destination_port       = "2020"
-  source_ip_address      = "0.0.0.0/0"
+# module "firewall" {
+#   source = "./modules/firewall"
+#   # Le pasamos la ID de la red para asociar el router y el FWaaS
+#   name                   = "ssh_access"
+#   protocol               = "tcp"
+#   ssh_access             = "allow"
+#   destination_ip_address = module.admin_vm.internal_ip
+#   destination_port       = "2020"
+#   source_ip_address      = "0.0.0.0/0"
 
-  rule1_name                   = "http_access"
-  rule1_protocol               = "tcp"
-  rule1_action                 = "allow"
-  rule1_destination_ip_address = module.loadbalancer.loadbalancer_vip_address
-  rule1_destination_port       = "80"
-  rule1_source_ip_address      = "0.0.0.0/0"
+#   rule1_name                   = "http_access"
+#   rule1_protocol               = "tcp"
+#   rule1_action                 = "allow"
+#   rule1_destination_ip_address = module.loadbalancer.loadbalancer_vip_address
+#   rule1_destination_port       = "80"
+#   rule1_source_ip_address      = "0.0.0.0/0"
 
-  rule2_name              = "internal_access"
-  rule2_protocol          = "any"
-  rule2_action            = "allow"
-  rule2_source_ip_address = "0.0.0.0/0"
+#   rule2_name              = "internal_access"
+#   rule2_protocol          = "any"
+#   rule2_action            = "allow"
+#   rule2_source_ip_address = "0.0.0.0/0"
 
-  policy_ingress_name = "ingress_policy"
+#   policy_ingress_name = "ingress_policy"
 
-  policy_egress_name = "egress_policy"
+#   policy_egress_name = "egress_policy"
 
-  router_port_id = module.router.router_port_id
+#   router_port_id = module.router.router_port_id
 
-  group_name = "my_firewall_group"
-}
+#   group_name = "my_firewall_group"
+# }
