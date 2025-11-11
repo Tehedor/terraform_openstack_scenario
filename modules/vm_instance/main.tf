@@ -22,25 +22,37 @@ resource "openstack_compute_instance_v2" "vm" {
   name            = var.name
   image_name      = var.image
   flavor_name     = var.flavor
-  # key_pair        = openstack_compute_keypair_v2.
   security_groups = var.security_groups
+
+  # key_pair        = openstack_compute_keypair_v2.
+  key_pair = var.use_key_pair ? var.key_pair : null
 
   # INYECCIÓN DINÁMICA DE CLOUD-INIT
   # La función file() lee el contenido del script yaml pasado por la variable user_data_file
-  user_data = file(var.user_data_file)
 
   # Conexión a la red interna (la ID viene como variable de entrada)
   network {
     uuid = var.network_id
   }
 
- #Añade la segunda red dinámicamente solo si es necesario
-  dynamic "network"{
-    for_each = var.asign_multiple_network ?[var.second_network_id] : []
-    content{
+  #Añade la segunda red dinámicamente solo si es necesario
+  dynamic "network" {
+    for_each = var.asign_multiple_network ? [var.second_network_id] : []
+    content {
       uuid = network.value
-    } 
-  } 
+    }
+  }
+
+  # User data con plantilla condicional
+
+  user_data = var.user_data_file != "" ? templatefile(var.user_data_file, {
+    IP       = var.ip_address
+    db_host  = var.db_host != null ? var.db_host : ""
+    db_user  = var.db_user != null ? var.db_user : ""
+    db_pass  = var.db_pass != null ? var.db_pass : ""
+    db_name  = var.db_name != null ? var.db_name : ""
+    tar_file = var.tar_file != null ? filebase64(var.tar_file) : ""
+  }) : null
 }
 
 
@@ -61,3 +73,5 @@ resource "openstack_compute_floatingip_associate_v2" "fip_assoc" {
   floating_ip = openstack_networking_floatingip_v2.fip[0].address
   instance_id = openstack_compute_instance_v2.vm.id
 }
+
+

@@ -1,0 +1,54 @@
+.
+|-- Makefile
+|-- MakefileOLD
+|-- check_deploy_folder
+|   |-- main.tf
+|   |-- outputs.tf
+|   |-- providers.tf
+|   |-- terraform.tfvars
+|   `-- variables.tf
+|-- cloud-init-scripts
+|   |-- admin_init.yaml
+|   |-- db_init.yaml
+|   `-- web_init.yaml
+|-- cloud_init_files
+|   |-- 00_tar_files
+|   |-- sql_files
+|   |   `-- init-data.sql
+|   |-- storage_files
+|   |   `-- foto.jpg
+|   `-- web_files
+|       |-- config.php
+|       |-- db_config.php
+|       |-- index.php
+|       `-- script.sh
+|-- main.tf
+|-- modules
+|   |-- firewall
+|   |   |-- main.tf
+|   |   `-- variables.tf
+|   |-- loadbalancer
+|   |   |-- main.tf
+|   |   |-- output.tf
+|   |   `-- variables.tf
+|   |-- network
+|   |   |-- main.tf
+|   |   |-- output.tf
+|   |   `-- variables.tf
+|   |-- router
+|   |   |-- main.tf
+|   |   |-- output.tf
+|   |   `-- variables.tf
+|   `-- vm_instance
+|       |-- main.tf
+|       |-- output.tf
+|       `-- variables.tf
+|-- notas.txt
+|-- outputs.tf
+|-- providers.tf
+|-- pruebas
+|-- secgroup.tf
+|-- terraform.tfvars
+`-- variables.tf
+
+13 directories, 38 files

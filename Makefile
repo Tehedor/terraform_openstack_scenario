@@ -108,6 +108,22 @@ destroy-db:
 	@terraform destroy -auto-approve -target=module.db_bbdd
 
 
+# ---------------------------------------------------------
+# Crear tar.gz de cada carpeta de cloud_init_files
+# ---------------------------------------------------------
+.PHONY: tar_create
+
+tar_create:
+	@echo "📦 Generando tar.gz de todos los servicios en cloud_init_files..."
+	@mkdir -p cloud_init_files/00_tar_files
+	@for dir in cloud_init_files/*/ ; do \
+		base=$$(basename $$dir); \
+		if [ "$$base" != "00_tar_files" ]; then \
+			echo "   - Empaquetando $$base..."; \
+			tar -czf cloud_init_files/00_tar_files/$$base.tar.gz -C cloud_init_files $$base; \
+		fi; \
+	done
+	@echo "✅ Todos los tars creados en cloud_init_files/00_tar_files"
 
 
 # ---------------------------------------------------------

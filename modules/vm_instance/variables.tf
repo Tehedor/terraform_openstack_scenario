@@ -40,6 +40,7 @@ variable "security_groups" {
 variable "user_data_file" {
   description = "Ruta al fichero de cloud-init específico para la VM (ej: ../../cloud-init-scripts/admin_init.yaml)"
   type        = string
+  default     = ""
 }
 
 variable "assign_floating_ip" {
@@ -58,4 +59,54 @@ variable "asign_multiple_network" {
   description = "Si es 'true', se asigna una segunda network(solo para ADMIN y S1,S2,S3)"
   type        = bool
   default     = false
+}
+
+
+
+
+
+# Base de datos contraseña
+variable "db_host" {
+  type        = string
+  default     = null
+  description = "Host de la base de datos (opcional)"
+}
+
+variable "db_user" {
+  type        = string
+  default     = null
+  description = "Usuario de la base de datos (opcional)"
+}
+
+variable "db_pass" {
+  type        = string
+  default     = null
+  sensitive   = true
+  description = "Contraseña de la base de datos (opcional)"
+}
+
+variable "db_name" {
+  type        = string
+  default     = null
+  description = "Nombre de la base de datos (opcional)"
+}
+
+
+# Servidor Admin
+variable "use_key_pair" {
+  description = "Indica si la VM necesita key_pair (ej: web/admin) o no (ej: MySQL)"
+  type        = bool
+  default     = true
+}
+
+variable "tar_file" {
+  description = "Ruta al tar.gz de la web (opcional, solo para web)"
+  type        = string
+  default     = null
+}
+
+variable "ip_address" {
+  description = "IP estática opcional a inyectar en la plantilla (opcional)."
+  type        = string
+  default     = ""
 }

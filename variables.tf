@@ -1,5 +1,6 @@
-# variables.tf
-
+# ---------------------------------------------------------
+# Variables VM instances
+# ---------------------------------------------------------
 variable "image_base_name" {
   description = "Nombre de la imagen base de Ubuntu cloud-img (ej: jammy-server-cloudimg-amd64-vnx)"
   type        = string
@@ -47,4 +48,37 @@ variable "ext_network" {
   description = "Nombre de la red externa (ExtNet) para acceso a Internet"
   type        = string
   default     = "ExtNet"
+}
+
+# Modulo VM web
+# ./variables.tf (root)
+variable "db_host" {
+  type        = string
+  description = "Host de la base de datos para los servidores web"
+  default     = "mysql.internal"
+}
+
+variable "db_user" {
+  type        = string
+  description = "Usuario de la base de datos para los servidores web"
+  default     = "webuser"
+}
+
+variable "db_pass" {
+  type        = string
+  description = "Contraseña de la base de datos para los servidores web"
+  sensitive   = true
+  default     = "secretpassword"
+}
+
+variable "db_name" {
+  type        = string
+  description = "Nombre de la base de datos para los servidores web"
+  default     = "usuarios_db"
+}
+
+variable "tar_file" {
+  description = "Contenido base64 del tar.gz (opcional, si ya pasas el contenido en base64)."
+  type        = string
+  default     = null
 }

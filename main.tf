@@ -51,30 +51,55 @@ module "admin_vm" {
   second_network_id      = module.networking2.network_id # Conectado a Net2
 
   # Configuración específica de ADMIN
-  user_data_file     = "./cloud-init-scripts/admin_init.yaml"
+  # user_data_file     = "./cloud-init-scripts/admin_init.yaml"
   assign_floating_ip = true # Requisito: ADMIN tendrá IP flotante [cite: 79]
   ssh_port           = 2025 # Requisito: Puerto SSH personalizado [cite: 149, 150]
 }
 
 # Servidores Web (S1, S2, S3) - Usando una cuenta dinámica para la escalabilidad
+# module "web" {
+#   source = "./modules/vm_instance"
+
+#   count = 3 # Despliega 3 servidores S1, S2, S3 [cite: 41]
+
+#   name     = "s${count.index + 1}"
+#   image    = var.image_base_name
+#   flavor   = var.flavor_web
+#   key_pair = var.key_pair_name
+
+#   network_id             = module.networking.network_id # Conectado a Net1
+#   asign_multiple_network = true
+#   second_network_id      = module.networking2.network_id # Conectado a Net2
+
+#   # Configuraciones específicas
+#   user_data_file     = "./cloud-init-scripts/web_init.yaml"
+#   assign_floating_ip = false
+# }
 module "web" {
   source = "./modules/vm_instance"
 
-  count = 3 # Despliega 3 servidores S1, S2, S3 [cite: 41]
+  count = 3
 
   name     = "s${count.index + 1}"
   image    = var.image_base_name
   flavor   = var.flavor_web
-  key_pair = var.key_pair_name
+  key_pair = "" # Opcional, web normalmente no necesita SSH
 
-  network_id             = module.networking.network_id # Conectado a Net1
+  network_id             = module.networking.network_id
   asign_multiple_network = true
-  second_network_id      = module.networking2.network_id # Conectado a Net2
+  second_network_id      = module.networking2.network_id
 
-  # Configuraciones específicas
-  user_data_file     = "./cloud-init-scripts/web_init.yaml"
+  # Configuraciones específicas de web
   assign_floating_ip = false
+
+  user_data_file = "./cloud-init-scripts/web_init.tpl"
+  tar_file       = "${path.module}/cloud_init_files/00_tar_files/web_files.tar.gz"
+  db_host        = var.db_host
+  db_user        = var.db_user
+  db_pass        = var.db_pass
+  db_name        = var.db_name
 }
+
 
 # Servidor de Base de Datos (BBDD)
 module "db_bbdd" {
@@ -85,7 +110,7 @@ module "db_bbdd" {
   flavor   = var.flavor_web
   key_pair = var.key_pair_name
 
-  network_id = module.networking2.network_id # Conectado a Net2
+  network_id             = module.networking2.network_id # Conectado a Net2
   asign_multiple_network = false
 
 
