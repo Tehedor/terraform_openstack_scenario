@@ -94,8 +94,8 @@ module "web" {
 
   user_data_file = "./cloud-init-scripts/web_init.tpl"
   # tar_file       = "${path.module}/cloud_init_files/00_tar_files/web_files.tar.gz"
-  # tar_file = filebase64("${path.module}/cloud_init_files/00_tar_files/web_files.tar.gz")
-  tar_file = base64encode(file("${path.module}/cloud_init_files/00_tar_files/web_files.tar.gz"))
+  tar_file = filebase64("${path.module}/cloud_init_files/00_tar_files/web_files.tar.gz")
+  # tar_file = base64encode(file("${path.module}/cloud_init_files/00_tar_files/web_files.tar.gz"))
   db_host        = var.db_host
   db_user        = var.db_user
   db_pass        = var.db_pass
