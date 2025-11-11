@@ -5,14 +5,16 @@
 |   |-- main.tf
 |   |-- outputs.tf
 |   |-- providers.tf
-|   |-- terraform.tfvars
 |   `-- variables.tf
 |-- cloud-init-scripts
-|   |-- admin_init.yaml
-|   |-- db_init.yaml
-|   `-- web_init.yaml
+|   |-- admin_init.tpl
+|   |-- db_init.tpl
+|   `-- web_init.tpl
 |-- cloud_init_files
 |   |-- 00_tar_files
+|   |   |-- sql_files.tar.gz
+|   |   |-- storage_files.tar.gz
+|   |   `-- web_files.tar.gz
 |   |-- sql_files
 |   |   `-- init-data.sql
 |   |-- storage_files
@@ -48,7 +50,6 @@
 |-- providers.tf
 |-- pruebas
 |-- secgroup.tf
-|-- terraform.tfvars
 `-- variables.tf
 
-13 directories, 38 files
+13 directories, 39 files

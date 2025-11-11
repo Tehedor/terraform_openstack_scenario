@@ -29,8 +29,8 @@ write_files:
               AllowOverride All
               Require all granted
           </Directory>
-          ErrorLog ${APACHE_LOG_DIR}/error.log
-          CustomLog ${APACHE_LOG_DIR}/access.log combined
+          ErrorLog /var/log/apache2/error.log
+          CustomLog /var/log/apache2/access.log combined
       </VirtualHost>
 
   # Tar.gz con los archivos de la web (base64 inyectado desde Terraform)
