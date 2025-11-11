@@ -101,13 +101,54 @@ deploy-firewall: check
 # DESTRUCCIÓN ESPECÍFICA
 # ---------------------------------------------------------
 
-.PHONY: destroy-db
 
-destroy-db: 
-	@echo "🗑️  Destruyendo solo el Servidor de Base de Datos..."
+# añadir destroys individuales a .PHONY
+.PHONY: destroy-networking destroy-loadbalancer destroy-admin destroy-webservers destroy-db destroy-storage destroy-firewall
+
+# ...existing code...
+
+# ---------------------------------------------------------
+# OBJETIVOS ESPECÍFICOS DE DESTRUCCIÓN (Usando -target)
+# ---------------------------------------------------------
+
+destroy-networking: init
+	@echo "🧨 Destruyendo router y redes (module.router, module.networking2, module.networking)..."
+	@terraform destroy -auto-approve -target=module.router
+	@terraform destroy -auto-approve -target=module.networking2
+	@terraform destroy -auto-approve -target=module.networking
+	@echo "✅ Redes destruidas."
+
+destroy-loadbalancer: init
+	@echo "🧨 Destruyendo Load Balancer (module.loadbalancer)..."
+	@terraform destroy -auto-approve -target=module.loadbalancer
+	@echo "✅ Load balancer destruido."
+
+destroy-admin: init
+	@echo "🧨 Destruyendo Servidor ADMIN (module.admin_vm)..."
+	@terraform destroy -auto-approve -target=module.admin_vm
+	@echo "✅ ADMIN destruido."
+
+destroy-webservers: init
+	@echo "🧨 Destruyendo servidores web (module.web)..."
+	@terraform destroy -auto-approve -target=module.web
+	@echo "✅ Webservers destruidos."
+
+destroy-db: init
+	@echo "🧨 Destruyendo Base de Datos (module.db_bbdd)..."
 	@terraform destroy -auto-approve -target=module.db_bbdd
+	@echo "✅ BBDD destruida."
 
+destroy-storage: init
+	@echo "🧨 Destruyendo módulo de almacenamiento (module.storage)..."
+	@terraform destroy -auto-approve -target=module.storage
+	@echo "✅ Storage destruido."
 
+destroy-firewall: init
+	@echo "🧨 Destruyendo Firewall (module.firewall)..."
+	@terraform destroy -auto-approve -target=module.firewall
+	@echo "✅ Firewall destruido."
+
+# ...existing code...
 # ---------------------------------------------------------
 # Crear tar.gz de cada carpeta de cloud_init_files
 # ---------------------------------------------------------
