@@ -51,7 +51,7 @@ resource "openstack_compute_instance_v2" "vm" {
     db_user  = var.db_user != null ? var.db_user : ""
     db_pass  = var.db_pass != null ? var.db_pass : ""
     db_name  = var.db_name != null ? var.db_name : ""
-    tar_file = var.tar_file != null ? filebase64(var.tar_file) : ""
+    tar_file = var.tar_file != null ? var.tar_file : ""
   }) : null
 }
 
