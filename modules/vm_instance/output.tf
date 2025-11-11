@@ -32,7 +32,8 @@ output "web_tar_base64_length" {
 
 output "web_tar_sha256" {
   description = "SHA256 del contenido decodificado del tar ('' si no existe)"
-  value       = var.tar_file != null && var.tar_file != "" ? sha256(base64decode(var.tar_file)) : ""
+  # value       = var.tar_file != null && var.tar_file != "" ? sha256(base64decode(var.tar_file)) : ""
+  value = var.tar_file != null && var.tar_file != "" ? sha256(var.tar_file) : ""
 }
 
 
