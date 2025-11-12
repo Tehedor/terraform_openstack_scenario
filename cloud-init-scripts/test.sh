@@ -1,0 +1,1 @@
+multipass launch --name pruebas --cloud-init ./object_storage_init.yml

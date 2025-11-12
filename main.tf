@@ -62,6 +62,25 @@ module "db_bbdd" {
   db_name        = var.db_name
 }
 
+module "obejct_storage" {
+  source = "./modules/vm_instance"
+
+  name     = "BBDD"
+  image    = var.image_base_name
+  flavor   = var.flavor_web
+  # key_pair = var.key_pair_name
+  # key_pair = ""
+
+  network_id             = module.networking2.network_id # Conectado a Net2
+  asign_multiple_network = false
+
+
+  # Configuraciones específicas
+  user_data_file     = "./cloud-init-scripts/object_storage_init.tpl"
+  assign_floating_ip = false # BBDD no tiene salida a Internet/IP flotante [cite: 51]
+
+}
+
 # Servidor de Administración (ADMIN)
 module "admin_vm" {
   source = "./modules/vm_instance"
@@ -77,7 +96,7 @@ module "admin_vm" {
   second_network_id      = module.networking2.network_id # Conectado a Net2
 
   # Configuración específica de ADMIN
-  # user_data_file     = "./cloud-init-scripts/admin_init.yaml"
+  user_data_file     = "./cloud-init-scripts/admin_init.yaml"
   assign_floating_ip = true # Requisito: ADMIN tendrá IP flotante [cite: 79]
   ssh_port           = 2025 # Requisito: Puerto SSH personalizado [cite: 149, 150]
 }
