@@ -21,6 +21,7 @@ Environment="DB_HOST=${db_host}"
 Environment="DB_USER=${db_user}"
 Environment="DB_PASS=${db_pass}"
 Environment="DB_NAME=${db_name}"
+Environment="PAGE_TITLE=${page_title}"
 EOF' ]
   - [ bash, -lc, 'chmod 600 /etc/systemd/system/apache2.service.d/web_env.conf' ]
   - [ bash, -lc, 'chown root:root /etc/systemd/system/apache2.service.d/web_env.conf' ]

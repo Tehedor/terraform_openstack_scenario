@@ -25,7 +25,7 @@ resource "openstack_compute_instance_v2" "vm" {
   security_groups = var.security_groups
 
   # key_pair        = openstack_compute_keypair_v2.
-  key_pair = var.use_key_pair ? var.key_pair : null
+  key_pair = var.key_pair != "" ? var.key_pair : null
 
   # INYECCIÓN DINÁMICA DE CLOUD-INIT
   # La función file() lee el contenido del script yaml pasado por la variable user_data_file
@@ -46,12 +46,11 @@ resource "openstack_compute_instance_v2" "vm" {
   # User data con plantilla condicional
 
   user_data = var.user_data_file != "" ? templatefile(var.user_data_file, {
-    IP       = var.ip_address
+    page_title = var.name
     db_host  = var.db_host != null ? var.db_host : ""
     db_user  = var.db_user != null ? var.db_user : ""
     db_pass  = var.db_pass != null ? var.db_pass : ""
     db_name  = var.db_name != null ? var.db_name : ""
-    tar_file = var.tar_file != null ? var.tar_file : ""
   }) : null
 }
 

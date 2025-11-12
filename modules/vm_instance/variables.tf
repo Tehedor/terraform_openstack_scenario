@@ -29,6 +29,7 @@ variable "second_network_id" {
 variable "key_pair" {
   description = "Nombre del Key Pair de OpenStack para acceso SSH"
   type        = string
+  default = null
 }
 
 variable "security_groups" {
@@ -92,18 +93,7 @@ variable "db_name" {
 }
 
 
-# Servidor Admin
-variable "use_key_pair" {
-  description = "Indica si la VM necesita key_pair (ej: web/admin) o no (ej: MySQL)"
-  type        = bool
-  default     = true
-}
 
-variable "tar_file" {
-  description = "Ruta al tar.gz de la web (opcional, solo para web)"
-  type        = string
-  default     = null
-}
 
 variable "ip_address" {
   description = "IP estática opcional a inyectar en la plantilla (opcional)."
