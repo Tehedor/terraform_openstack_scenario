@@ -8,6 +8,7 @@ packages:
 
 runcmd:
   # Clonar el repositorio y copiar solo la carpeta phpApp
+  - [ bash, -lc, 'rm -f /var/www/html/index.html || true' ]
   - [ bash, -lc, 'mkdir -p /tmp/web_clone && git clone --depth=1 https://github.com/Tehedor/web_php_basica.git /tmp/web_clone' ]
   - [ bash, -lc, 'cp -r /tmp/web_clone/phpApp/* /var/www/html/' ]
   - [ bash, -lc, 'chown -R www-data:www-data /var/www/html' ]
