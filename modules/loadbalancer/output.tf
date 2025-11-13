@@ -8,3 +8,8 @@ output "lb_port_id" {
   description = "ID del puerto VIP del Load Balancer"
   value       = openstack_lb_loadbalancer_v2.loadBalancer.vip_port_id
 }
+
+
+# output "lb_port_id" {
+#   value = openstack_loadbalancer_v2.lb.vip_port_id
+# }

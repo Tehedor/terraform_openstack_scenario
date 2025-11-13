@@ -102,7 +102,7 @@ module "db_bbdd" {
 module "object_storage" {
   source = "./modules/vm_instance"
 
-  name     = "BBDD"
+  name     = "ObjectStorage"
   image    = var.image_base_name
   flavor   = var.flavor_web
   # key_pair = var.key_pair_name
@@ -260,10 +260,16 @@ module "firewall" {
   group_name = "my_firewall_group"
 
 
-  ports = [
+  # ports = [
+  #   module.admin_vm.port_id,
+  #   module.loadbalancer.lb_port_id
+  # ]
+
+  ports = compact([
     module.admin_vm.port_id,
     module.loadbalancer.lb_port_id
-  ]
+  ])
+
 
 }
 

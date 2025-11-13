@@ -23,9 +23,14 @@ output "floating_ip" {
 
 # Puerto principal de la instancia (para usar en FWaaS u otras asociaciones)
 output "port_id" {
-  description = "ID del puerto principal asociado a la VM"
-  value = try(
-    openstack_compute_instance_v2.vm.network[0].port
-  )
+  value = openstack_compute_instance_v2.vm.network[0].port
+}
+
+
+# Clave privada generada por OpenStack (solo si Terraform crea el keypair)
+output "private_key" {
+  description = "Clave privada generada por OpenStack para el keypair"
+  value       = openstack_compute_keypair_v2.key[0].private_key
+  sensitive   = true
 }
 

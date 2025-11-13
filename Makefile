@@ -192,6 +192,18 @@ graph:
 	@terraform graph | dot -Tpng -o graph.png
 	@echo "✅ graph.png creado en $(PWD)/graph.png"
 
+
+vip_ip:
+	@echo "🔎 Obteniendo VIP del Load Balancer..."
+	@terraform state show 'module.loadbalancer.openstack_lb_loadbalancer_v2.loadBalancer' | grep vip_address || true
+
+extract_key:
+	@echo "🔑 Extrayendo la clave privada del keypair..."
+	@terraform output -raw private_key > ./keys/my_key.pem
+	@chmod 600 ./keys/my_key.pem
+	@echo "✅ Clave privada guardada en ./keys/my_key.pem"
+
+
 # ---------------------------------------------------------
 # Nodos de openstack
 # ---------------------------------------------------------
