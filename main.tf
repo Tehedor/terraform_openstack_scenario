@@ -34,9 +34,39 @@ module "router" {
 
 
 
+
 # ---------------------------------------------------------
 # 2. SERVIDORES
 # ---------------------------------------------------------
+
+
+# Net3 solo si create_temp_net = true
+module "networking3" {
+  source = "./modules/network"
+  count  = var.create_temp_net ? 1 : 0
+
+  network_name = "Net3"
+  subnet_name  = "subnet3"
+  cidr         = var.net3_cidr
+
+  # En tu módulo de subnet asegúrate de exponer dns_nameservers/gateway si lo soporta.
+  # Si tu módulo/network no soporta dns_nameservers/gateway, ver más abajo cómo añadir el recurso openstack_networking_subnet_v2 directamente.
+  # gateway_ip      = cidrhost(var.net3_cidr, 1)
+}
+
+# Router de backup que conecta Net3 a la red externa (ExtNet)
+module "backup_router" {
+  source = "./modules/router"
+  count  = var.create_temp_net ? 1 : 0
+
+  router_name = "backup_router"
+  # conectar a Net3: usa los outputs del módulo networking3
+  network_id  = try(module.networking3[0].network_id, "")
+  subnet_id   = try(module.networking3[0].subnet_id, "")
+  ext_network = var.ext_network
+  gateway     = cidrhost(var.net3_cidr, 1)
+}
+
 
 # Servidor de Base de Datos (BBDD)
 module "db_bbdd" {
@@ -60,6 +90,9 @@ module "db_bbdd" {
   db_user        = var.db_user
   db_pass        = var.db_pass
   db_name        = var.db_name
+  depends_on = [ 
+     module.backup_router[0]
+   ]
 }
 
 module "object_storage" {
@@ -79,8 +112,13 @@ module "object_storage" {
   user_data_file     = "./cloud-init-scripts/object_storage_init.tpl"
   assign_floating_ip = false # BBDD no tiene salida a Internet/IP flotante [cite: 51]
 
+  depends_on = [ 
+    module.backup_router[0]
+   ]
 }
-
+# ---------------------------------------------------------
+# 3. SERVIDORES
+# ---------------------------------------------------------
 # Servidor de Administración (ADMIN)
 module "admin_vm" {
   source = "./modules/vm_instance"
@@ -161,7 +199,7 @@ module "web" {
 
 
 # # ---------------------------------------------------------
-# # 3. LOAD BALANCER (OCTAVIA)
+# # 4. LOAD BALANCER (OCTAVIA)
 # # ---------------------------------------------------------
 # Usar los recursos nativos de Octavia (LBaaS) [cite: 98]
 module "loadbalancer" {
@@ -181,7 +219,7 @@ module "loadbalancer" {
 }
 
 # # ---------------------------------------------------------
-# # 4. FIREWALL (FWaaS) y GRUPOS DE SEGURIDAD
+# # 5. FIREWALL (FWaaS) y GRUPOS DE SEGURIDAD
 # # ---------------------------------------------------------
 # Se asume que el router que conecta Net1 a ExtNet se creará aquí o en el módulo 'security'.
 # Por simplicidad, se puede implementar el firewall como un Security Group "open" en este nivel [cite: 120]

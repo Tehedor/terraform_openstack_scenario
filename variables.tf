@@ -76,3 +76,18 @@ variable "db_name" {
   description = "Nombre de la base de datos para los servidores web"
   default     = "usuarios_db"
 }
+
+
+
+# Temporal NET
+variable "create_temp_net" {
+  description = "Si true crea Net3 y el router temporal para dar salida a internet a la BBDD."
+  type        = bool
+  default     = false
+}
+
+variable "net3_cidr" {
+  description = "CIDR para Net3 (solo para la BBDD temporalmente)."
+  type        = string
+  default     = "10.1.3.0/24"
+}

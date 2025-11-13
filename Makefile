@@ -1,4 +1,4 @@
-.PHONY: help fmt validate init clean check destroy_all deploy_all
+.PHONY: help fmt validate init clean check destroy_all deploy_all deploy_test
 
 fmt:
 	@echo "📝 Formateando código Terraform..."
@@ -80,6 +80,16 @@ destroy_all:
 	@echo "🗑️  DESTRUCCIÓN FINALIZADA."
 
 deploy_all: check
+	@echo "🌟 INICIANDO DESPLIEGUE COMPLETO DE ARQUITECTURA CON RED TEMPORAL"
+	@terraform apply -auto-approve "
+	@echo "⏳ Esperando a que la BBDD y el Object Storage terminen de configurarse..."
+	@sleep 120  # Espera 2 minutos (ajusta según el tiempo de cloud-init o instalación)
+	@echo "🧹 Eliminando la conexión temporal a Net1 (retirando acceso a Internet de la BBDD)"
+	@terraform apply -auto-approve -var="attach_to_net1=false"
+	@echo "🎉 ARQUITECTURA FINAL DESPLEGADA Y RED TEMPORAL ELIMINADA CON ÉXITO"
+
+
+deploy_test: check
 	@echo "🌟 INICIANDO DESPLIEGUE COMPLETO DE ARQUITECTURA"
 	@terraform apply -auto-approve
 	@echo "🎉 ARQUITECTURA COMPLETA DESPLEGADA con éxito."
