@@ -83,7 +83,7 @@ module "db_bbdd" {
 
 
   # Configuraciones específicas
-  user_data_file     = "./cloud-init-scripts/db_init.yaml"
+  user_data_file     = "./cloud-init-scripts/db_init.tpl"
   assign_floating_ip = false # BBDD no tiene salida a Internet/IP flotante [cite: 51]
 
 
@@ -134,7 +134,7 @@ module "admin_vm" {
   second_network_id      = module.networking2.network_id # Conectado a Net2
 
   # Configuración específica de ADMIN
-  user_data_file     = "./cloud-init-scripts/admin_init.yaml"
+  user_data_file     = "./cloud-init-scripts/admin_init.tpl"
   assign_floating_ip = true # Requisito: ADMIN tendrá IP flotante [cite: 79]
   ssh_port           = 2025 # Requisito: Puerto SSH personalizado [cite: 149, 150]
 }
@@ -155,7 +155,7 @@ module "admin_vm" {
 #   second_network_id      = module.networking2.network_id # Conectado a Net2
 
 #   # Configuraciones específicas
-#   user_data_file     = "./cloud-init-scripts/web_init.yaml"
+#   user_data_file     = "./cloud-init-scripts/web_init.tpl"
 #   assign_floating_ip = false
 # }
 module "web" {
