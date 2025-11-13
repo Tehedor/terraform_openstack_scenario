@@ -81,7 +81,7 @@ module "db_bbdd" {
   network_id             = module.networking2.network_id # Conectado a Net2
   # asign_multiple_network = true
   asign_multiple_network = var.create_temp_net
-  second_network_id      = var.create_temp_net ? module.networking3.network_id : null
+  second_network_id      = var.create_temp_net ? module.networking3[0].network_id : null
 
 
   # Configuraciones específicas
@@ -108,7 +108,7 @@ module "object_storage" {
 
   network_id             = module.networking2.network_id # Conectado a Net2
   asign_multiple_network = var.create_temp_net
-  second_network_id      = var.create_temp_net ? module.networking3.network_id : null
+  second_network_id      = var.create_temp_net ? module.networking3[0].network_id : null
 
 
   # Configuraciones específicas
