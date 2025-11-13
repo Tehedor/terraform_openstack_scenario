@@ -12,3 +12,9 @@ variable "cidr" {
   description = "Rango CIDR de la subred (ej: 10.1.2.0/24)"
   type        = string
 }
+
+variable "has_internet" {
+  description = "Si true, la subred tendrá salida a Internet (configura gateway y DNS)"
+  type        = bool
+  default     = true
+}

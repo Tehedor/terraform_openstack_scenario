@@ -28,18 +28,20 @@ resource "openstack_networking_network_v2" "net" {
 // - `network_id` enlaza la subred con la red creada (`net`).
 // - `cidr` define el rango de direcciones IP de la subred (ej. 10.1.2.0/24).
 // - `gateway_ip` especifica la puerta de enlace dentro del CIDR.
-// - `allocation_pool` restringe el rango de IPs que se otorgarán dinámicamente.
 resource "openstack_networking_subnet_v2" "subnet" {
-  name            = var.subnet_name
-  network_id      = openstack_networking_network_v2.net.id
-  cidr            = var.cidr
-  ip_version      = 4
-  dns_nameservers = ["8.8.8.8"]
+  name       = var.subnet_name
+  network_id = openstack_networking_network_v2.net.id
+  cidr       = var.cidr
+  ip_version = 4
 
-  gateway_ip = cidrhost(var.cidr, 1)
+  # DNS solo si hay salida a Internet
+  dns_nameservers = var.has_internet ? ["8.8.8.8", "1.1.1.1"] : []
+
+  # Gateway solo si hay salida a Internet
+  gateway_ip = var.has_internet ? cidrhost(var.cidr, 1) : null
 
   allocation_pool {
-    start = cidrhost(var.cidr, 2)   # Ej: 10.1.2.2
-    end   = cidrhost(var.cidr, 100) # Ej: 10.1.2.100 (ajustable según necesidades)
+    start = cidrhost(var.cidr, 2)
+    end   = cidrhost(var.cidr, 100)
   }
 }
