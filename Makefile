@@ -203,6 +203,9 @@ extract_key:
 	@chmod 600 ./keys/my_key.pem
 	@echo "✅ Clave privada guardada en ./keys/my_key.pem"
 
+cp_keyhost:
+	@cp -r ~/shared/keys/* ./keys/
+
 
 # ---------------------------------------------------------
 # Nodos de openstack
