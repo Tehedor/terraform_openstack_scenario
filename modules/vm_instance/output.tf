@@ -29,8 +29,6 @@ output "port_id" {
 
 # Clave privada generada por OpenStack (solo si Terraform crea el keypair)
 output "private_key" {
-  description = "Clave privada generada por OpenStack para el keypair"
-  value       = openstack_compute_keypair_v2.key[0].private_key
-  sensitive   = true
+  description = "Clave privada del keypair (solo si se creó)"
+  value       = length(openstack_compute_keypair_v2.key) > 0 ? openstack_compute_keypair_v2.key[0].private_key : null
 }
-
