@@ -253,4 +253,12 @@ module "firewall" {
   router_port_id = module.router.router_port_id
 
   group_name = "my_firewall_group"
+
+
+  ports = [
+    module.admin_vm.port_id,
+    module.loadbalancer.lb_port_id
+  ]
+
 }
+

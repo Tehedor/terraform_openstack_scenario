@@ -102,3 +102,10 @@ variable "group_name" {
   description = "Nombre del grupo de firewall"
   type        = string
 }
+
+
+variable "ports" {
+  description = "Lista de IDs de puertos (VMs, LoadBalancer, etc.) a asociar al firewall"
+  type        = list(string)
+  default     = []
+}

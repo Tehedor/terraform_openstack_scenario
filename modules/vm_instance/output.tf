@@ -21,3 +21,12 @@ output "floating_ip" {
 }
 
 
+# Puerto principal de la instancia (para usar en FWaaS u otras asociaciones)
+output "port_id" {
+  description = "ID del puerto principal asociado a la VM"
+  value = try(
+    openstack_networking_port_v2.this.id,
+    openstack_compute_instance_v2.vm.network[0].port
+  )
+}
+

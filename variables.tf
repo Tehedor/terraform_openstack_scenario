@@ -83,7 +83,7 @@ variable "db_name" {
 variable "create_temp_net" {
   description = "Si true crea Net3 y el router temporal para dar salida a internet a la BBDD."
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "net3_cidr" {

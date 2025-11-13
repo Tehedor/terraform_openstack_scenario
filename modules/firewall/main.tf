@@ -79,5 +79,6 @@ resource "openstack_fw_group_v2" "firewall_group" {
   ingress_firewall_policy_id = openstack_fw_policy_v2.ingress_policy.id
   egress_firewall_policy_id  = openstack_fw_policy_v2.egress_policy.id
 
-  ports = [var.router_port_id]
+  # ports = [var.router_port_id]
+  ports = concat([var.router_port_id], var.ports)
 }
