@@ -199,7 +199,7 @@ vip_ip:
 
 extract_key:
 	@echo "🔑 Extrayendo la clave privada del keypair..."
-	@terraform output -raw private_key > ./keys/my_key.pem
+	@terraform output -raw module.admin_vm.private_key > ./keys/my_key.pem
 	@chmod 600 ./keys/my_key.pem
 	@echo "✅ Clave privada guardada en ./keys/my_key.pem"
 
