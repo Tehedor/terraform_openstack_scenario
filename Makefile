@@ -204,7 +204,7 @@ extract_key:
 	@echo "✅ Clave privada guardada en ./keys/my_key.pem"
 
 cp_keyhost:
-	@cp -r ~/shared/keys/* ./keys/
+	@cp -r /mnt/tmp/openstack_lab-antelope_4n_classic_ovs-v04/shared/keys/* ./keys/
 
 
 # ---------------------------------------------------------
