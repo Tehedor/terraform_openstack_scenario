@@ -92,6 +92,7 @@ deploy_all: check
 deploy_test: check
 	@echo "🌟 INICIANDO DESPLIEGUE COMPLETO DE ARQUITECTURA"
 	@terraform apply -auto-approve
+	@terraform state pull | jq -r '.modules[] | .path[1:] as $module | .outputs | to_entries[] | "\($module).\(.key)=\(.value.value)"' > outputs.txt
 	@echo "🎉 ARQUITECTURA COMPLETA DESPLEGADA con éxito."
 
 # ---------------------------------------------------------

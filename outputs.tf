@@ -19,3 +19,11 @@
 #   description = "Dirección IP interna de la Base de Datos (accesible solo desde Net1/Net2)"
 #   value       = module.db_bbdd.internal_ip
 # }
+
+output "admin_vm_internal_ip" {
+  value = module.admin_vm.internal_ip
+}
+
+output "web_vms_ports" {
+  value = module.web[*].port_id
+}
