@@ -79,7 +79,9 @@ module "db_bbdd" {
   # key_pair = ""
 
   network_id             = module.networking2.network_id # Conectado a Net2
-  asign_multiple_network = false
+  # asign_multiple_network = true
+  asign_multiple_network = var.create_temp_net
+  second_network_id      = var.create_temp_net ? module.networking3.network_id : null
 
 
   # Configuraciones específicas
@@ -105,7 +107,8 @@ module "object_storage" {
   # key_pair = ""
 
   network_id             = module.networking2.network_id # Conectado a Net2
-  asign_multiple_network = false
+  asign_multiple_network = var.create_temp_net
+  second_network_id      = var.create_temp_net ? module.networking3.network_id : null
 
 
   # Configuraciones específicas
