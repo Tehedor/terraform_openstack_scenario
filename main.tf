@@ -127,7 +127,7 @@ module "admin_vm" {
   image           = var.image_base_name
   flavor          = var.flavor_web
   key_pair        = var.key_pair_name
-  security_groups = [openstack_networking_secgroup_v2.my_security_group.name]
+  security_groups = [openstack_networking_secgroup_v2.my_security_group.id]
 
   network_id             = module.networking.network_id # Conectado a Net1
   asign_multiple_network = true
