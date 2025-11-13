@@ -260,15 +260,15 @@ module "firewall" {
   group_name = "my_firewall_group"
 
 
-  ports = [
-    module.admin_vm.port_id,
-    module.loadbalancer.lb_port_id
-  ]
-
-  # ports = compact([
+  # ports = [
   #   module.admin_vm.port_id,
   #   module.loadbalancer.lb_port_id
-  # ])
+  # ]
+
+  ports = compact([
+    module.admin_vm.port_id,
+    module.loadbalancer.lb_port_id
+  ])
 
 
 }
