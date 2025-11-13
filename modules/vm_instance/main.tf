@@ -9,10 +9,10 @@ terraform {
 # ---------------------------------------------------------
 # 0. RECURSO DE KEYPAIRS
 # # ---------------------------------------------------------
-# resource "openstack_compute_keypair_v2" "key{
-#   name            = var.key_pair
-#   public_key = file()
-# }"
+resource "openstack_compute_keypair_v2" "key"{
+  name            = var.key_pair
+  # public_key = file()
+}
 
 
 # ---------------------------------------------------------
