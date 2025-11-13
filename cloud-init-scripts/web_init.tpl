@@ -17,7 +17,7 @@ runcmd:
   - [ bash, -lc, 'mkdir -p /etc/systemd/system/apache2.service.d' ]
   - [ bash, -lc, 'cat <<EOF > /etc/systemd/system/apache2.service.d/web_env.conf
 [Service]
-Environment="DB_HOST=${db_host}"
+Environment="DB_HOST=${db_host}:3306"
 Environment="DB_USER=${db_user}"
 Environment="DB_PASS=${db_pass}"
 Environment="DB_NAME=${db_name}"
