@@ -29,7 +29,7 @@ variable "second_network_id" {
 variable "key_pair" {
   description = "Nombre del Key Pair de OpenStack para acceso SSH"
   type        = string
-  default = null
+  default = ""
 }
 
 variable "security_groups" {

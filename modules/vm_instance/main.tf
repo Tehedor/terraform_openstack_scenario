@@ -9,10 +9,17 @@ terraform {
 # ---------------------------------------------------------
 # 0. RECURSO DE KEYPAIRS
 # # ---------------------------------------------------------
-resource "openstack_compute_keypair_v2" "key"{
-  name            = var.key_pair
-  # public_key = file()
+# resource "openstack_compute_keypair_v2" "key"{
+#   name            = var.key_pair
+#   # public_key = file()
+# }
+
+resource "openstack_compute_keypair_v2" "key" {
+  count = var.key_pair != "" ? 1 : 0
+  name  = var.key_pair
+  # public_key = file(var.public_key_file) # si quieres importar una clave
 }
+
 
 
 # ---------------------------------------------------------
@@ -25,6 +32,7 @@ resource "openstack_compute_instance_v2" "vm" {
   security_groups = var.security_groups
 
   # key_pair        = openstack_compute_keypair_v2.
+  # key_pair = var.key_pair != "" ? var.key_pair : null
   key_pair = var.key_pair != "" ? var.key_pair : null
 
   # INYECCIÓN DINÁMICA DE CLOUD-INIT
