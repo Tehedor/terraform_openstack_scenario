@@ -89,5 +89,5 @@ variable "create_temp_net" {
 variable "net3_cidr" {
   description = "CIDR para Net3 (solo para la BBDD temporalmente)."
   type        = string
-  default     = "10.1.3.0/24"
+  default     = "10.1.1.0/24"
 }
