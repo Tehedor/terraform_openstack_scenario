@@ -185,7 +185,7 @@ destroy-firewall: init
 # ---------------------------------------------------------
 # Create grpah
 # ---------------------------------------------------------
-.PHONY: graph
+.PHONY: graph extract_key cp_keyhost
 
 graph:  
 	@echo "🖼️  Generando graph.png (terraform graph -> dot)..."
