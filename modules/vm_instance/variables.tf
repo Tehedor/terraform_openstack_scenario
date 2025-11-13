@@ -92,7 +92,11 @@ variable "db_name" {
   description = "Nombre de la base de datos (opcional)"
 }
 
-
+variable "object_storage_host" {
+  type        = string
+  description = "Host del servicio de Object Storage"
+  default     = null
+}
 
 
 variable "ip_address" {
@@ -100,3 +104,4 @@ variable "ip_address" {
   type        = string
   default     = ""
 }
+

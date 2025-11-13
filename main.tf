@@ -62,7 +62,7 @@ module "db_bbdd" {
   db_name        = var.db_name
 }
 
-module "obejct_storage" {
+module "object_storage" {
   source = "./modules/vm_instance"
 
   name     = "BBDD"
@@ -146,11 +146,15 @@ module "web" {
   db_pass        = var.db_pass
   db_name        = var.db_name
 
+
+  object_storage_host = module.object_storage.internal_ip
+
   depends_on = [
     module.networking,
     module.networking2,
     module.router,
-    module.db_bbdd
+    module.db_bbdd,
+    module.object_storage
   ]
 
 }

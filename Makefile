@@ -7,25 +7,56 @@ fmt:
 # Show a helpful list of make targets and usage
 help:
 	@echo "Makefile - lista de objetivos disponibles:" \
+		&& echo "" \
+		&& echo "BÁSICOS:" \
 		&& echo "  help                 - Mostrar esta ayuda" \
 		&& echo "  fmt                  - Formatear código Terraform (terraform fmt -recursive)" \
-		&& echo "  validate             - Validar la configuración Terraform (terraform validate)" \
 		&& echo "  init                 - Inicializar Terraform (terraform init)" \
-		&& echo "  clean                - Limpiar archivos temporales (.terraform, lock)" \
+		&& echo "  validate             - Validar la configuración Terraform (terraform validate)" \
+		&& echo "  clean                - Limpiar archivos temporales (.terraform, .terraform.lock.hcl)" \
+		&& echo "" \
+		&& echo "CHEQUEOS:" \
 		&& echo "  check                - init + fmt + validate" \
+		&& echo "" \
+		&& echo "DESPLIEGUE (targets):" \
+		&& echo "  deploy-networking    - Desplegar redes y router (module.networking, networking2, router)" \
+		&& echo "  deploy-admin         - Desplegar servidor ADMIN (module.admin_vm)" \
+		&& echo "  deploy-webservers    - Desplegar servidores web (module.web)" \
+		&& echo "  deploy-db            - Desplegar Base de Datos (module.db_bbdd)" \
+		&& echo "  deploy-object_storage- Desplegar Object Storage (module.object_storage)" \
+		&& echo "  deploy-loadbalancer  - Desplegar Load Balancer (module.loadbalancer)" \
+		&& echo "  deploy-firewall      - Desplegar Firewall (module.firewall)" \
 		&& echo "  deploy_all           - Ejecutar check y aplicar toda la infraestructura" \
-		&& echo "  destroy_all          - Destruir toda la infraestructura (terraform destroy)" \
-		&& echo "  deploy-networking    - Desplegar solo el módulo de networking (module.networking)" \
-		&& echo "  deploy-loadbalancer  - Desplegar solo el módulo del load balancer" \
-		&& echo "  deploy-admin         - Desplegar solo el servidor ADMIN (module.admin_vm)" \
-		&& echo "  deploy-webservers    - Desplegar servidores web S1,S2,S3" \
-		&& echo "  deploy-db            - Desplegar solo la base de datos (module.db_bbdd)" \
-		&& echo "  deploy-storage       - Desplegar módulo de almacenamiento (si existe)" \
-		&& echo "  destroy-db           - Destruir solo la base de datos" \
-		&& echo "  run_nodes1           - Script personalizado (get-openstack-tutorial.sh)" \
-		&& echo "  run_nodes2           - Crear/arrancar laboratorio local VNX (scripts locales)" \
-		&& echo "  destroy_nodes        - Destruir nodos del laboratorio VNX" \
-		&& echo "  cp_shared            - Copiar el repo al shared del laboratorio VNX"
+		&& echo "" \
+		&& echo "DESTRUCCIÓN (targets):" \
+		&& echo "  destroy-networking   - Destruir redes y router (module.router, networking2, networking)" \
+		&& echo "  destroy-admin        - Destruir ADMIN (module.admin_vm)" \
+		&& echo "  destroy-webservers   - Destruir web servers (module.web)" \
+		&& echo "  destroy-db           - Destruir Base de Datos (module.db_bbdd)" \
+		&& echo "  destroy-storage      - Destruir Storage (module.storage)" \
+		&& echo "  destroy-loadbalancer - Destruir LB (module.loadbalancer)" \
+		&& echo "  destroy-firewall     - Destruir Firewall (module.firewall)" \
+		&& echo "  destroy_all          - Destruir toda la infraestructura" \
+		&& echo "" \
+		&& echo "DIAGNÓSTICO & HERRAMIENTAS:" \
+		&& echo "  graph                - Generar graph.png (terraform graph -> dot)" \
+		&& echo "  cp_shared            - Copiar repo al shared del laboratorio VNX" \
+		&& echo "" \
+		&& echo "LAB / NODOS / SCRIPTS:" \
+		&& echo "  run_nodes1           - Ejecutar get-openstack-tutorial.sh" \
+		&& echo "  run_nodes2           - Crear/arrancar laboratorio VNX (vnx)" \
+		&& echo "  run_problem_terraform- Reparar/instalar Terraform en el lab" \
+		&& echo "  destroy_nodes        - Destruir nodos VNX" \
+		&& echo "" \
+		&& echo "OTROS / USO:" \
+		&& echo "  tar_create           - Generar tars en cloud_init_files/00_tar_files (Make target) if defined" \
+		&& echo "  tar_extract          - Extraer tars de cloud_init_files/00_tar_files (Make target) if defined" \
+		&& echo "  clean                - Limpiar (.terraform, lock)" \
+		&& echo "" \
+		&& echo "Ejemplos:" \
+		&& echo "  make deploy-networking" \
+		&& echo "  make deploy-webservers" \
+		&& echo "  make graph"
 
 validate:
 	@echo "✅ Validando configuración Terraform..."
@@ -57,7 +88,7 @@ deploy_all: check
 # OBJETIVOS ESPECÍFICOS DE DESPLIEGUE (Usando -target)
 # ---------------------------------------------------------
 
-.PHONY: deploy-networking deploy-loadbalancer deploy-admin deploy-webservers deploy-db deploy-storage
+.PHONY: deploy-networking deploy-loadbalancer deploy-admin deploy-webservers deploy-db deploy-object_storage
 
 # 1. Redes (Net1 y Net2)
 deploy-networking: check
@@ -84,9 +115,9 @@ deploy-db: check
 	@terraform apply -auto-approve -target=module.db_bbdd
 
 # 5. Almacenamiento (Opcional)
-deploy-storage: check
-	@echo "🚀 Desplegando Módulo de Almacenamiento (module.storage)..."
-	@terraform apply -auto-approve -target=module.storage
+deploy-object_storage: check
+	@echo "🚀 Desplegando Módulo de Almacenamiento (module.object_storage)..."
+	@terraform apply -auto-approve -target=module.object_storage
 
 # 6. Balanceador de Carga (LB)
 deploy-loadbalancer: check
@@ -97,19 +128,11 @@ deploy-loadbalancer: check
 deploy-firewall: check
 	@echo "🚀 Desplegando Módulo de Firewall (module.firewall)..."
 	@terraform apply -auto-approve -target=module.firewall
-# ---------------------------------------------------------
-# DESTRUCCIÓN ESPECÍFICA
-# ---------------------------------------------------------
-
-
-# añadir destroys individuales a .PHONY
-.PHONY: destroy-networking destroy-loadbalancer destroy-admin destroy-webservers destroy-db destroy-storage destroy-firewall
-
-# ...existing code...
 
 # ---------------------------------------------------------
 # OBJETIVOS ESPECÍFICOS DE DESTRUCCIÓN (Usando -target)
 # ---------------------------------------------------------
+.PHONY: destroy-networking destroy-loadbalancer destroy-admin destroy-webservers destroy-db destroy-storage destroy-firewall
 
 destroy-networking: init
 	@echo "🧨 Destruyendo router y redes (module.router, module.networking2, module.networking)..."
@@ -148,24 +171,16 @@ destroy-firewall: init
 	@terraform destroy -auto-approve -target=module.firewall
 	@echo "✅ Firewall destruido."
 
-# ...existing code...
-# ---------------------------------------------------------
-# Crear tar.gz de cada carpeta de cloud_init_files
-# ---------------------------------------------------------
-.PHONY: tar_create
 
-tar_create:
-	@echo "📦 Generando tar.gz de todos los servicios en cloud_init_files..."
-	@mkdir -p cloud_init_files/00_tar_files
-	@for dir in cloud_init_files/*/ ; do \
-		base=$$(basename $$dir); \
-		if [ "$$base" != "00_tar_files" ]; then \
-			echo "   - Empaquetando $$base..."; \
-			tar -czf cloud_init_files/00_tar_files/$$base.tar.gz -C cloud_init_files $$base; \
-		fi; \
-	done
-	@echo "✅ Todos los tars creados en cloud_init_files/00_tar_files"
+# ---------------------------------------------------------
+# Create grpah
+# ---------------------------------------------------------
+.PHONY: graph
 
+graph:  
+	@echo "🖼️  Generando graph.png (terraform graph -> dot)..."
+	@terraform graph | dot -Tpng -o graph.png
+	@echo "✅ graph.png creado en $(PWD)/graph.png"
 
 # ---------------------------------------------------------
 # Nodos de openstack

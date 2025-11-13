@@ -76,9 +76,3 @@ variable "db_name" {
   description = "Nombre de la base de datos para los servidores web"
   default     = "usuarios_db"
 }
-
-variable "tar_file" {
-  description = "Contenido base64 del tar.gz (opcional, si ya pasas el contenido en base64)."
-  type        = string
-  default     = null
-}
