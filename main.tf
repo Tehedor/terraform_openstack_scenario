@@ -9,7 +9,7 @@ module "networking" {
 
   network_name = "Net1"
   subnet_name  = "subnet1"
-  cidr         = var.
+  cidr         = var.net1_cidr
   has_internet = true
 }
 
@@ -49,11 +49,11 @@ module "networking3" {
   network_name = "Net3"
   subnet_name  = "subnet3"
   cidr         = var.net3_cidr
+  has_internet = true
 
   # En tu módulo de subnet asegúrate de exponer dns_nameservers/gateway si lo soporta.
   # Si tu módulo/network no soporta dns_nameservers/gateway, ver más abajo cómo añadir el recurso openstack_networking_subnet_v2 directamente.
   # gateway_ip      = cidrhost(var.net3_cidr, 1)
-  has_internet = true
 }
 
 # Router de backup que conecta Net3 a la red externa (ExtNet)
