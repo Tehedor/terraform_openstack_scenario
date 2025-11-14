@@ -93,3 +93,10 @@ variable "net3_cidr" {
   default     = "10.1.3.0/24"
 }
 
+
+
+variable "actions_ssh_admin" {
+  description = "Acciones permitidas por el firewall para el servidor ADMIN (SSH personalizado) Allow or deny tráfico on port 2025."
+  type        = string
+  default     = "allow"
+}

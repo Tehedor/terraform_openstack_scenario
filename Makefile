@@ -83,7 +83,7 @@ deploy_all: check
 	@echo "⏳ Esperando a que la BBDD y el Object Storage terminen de configurarse..."
 	@sleep 120  # Espera 2 minutos (ajusta según el tiempo de cloud-init o instalación)
 	@echo "🧹 Eliminando la conexión temporal a Net1 (retirando acceso a Internet de la BBDD)"
-	@terraform apply -auto-approve -var="attach_to_net1=false"
+	@terraform apply -auto-approve -var="create_temp_net=false"
 	@echo "🎉 ARQUITECTURA FINAL DESPLEGADA Y RED TEMPORAL ELIMINADA CON ÉXITO"
 
 

@@ -35,10 +35,6 @@ module "router" {
 
 
 
-
-
-
-
 # ---------------------------------------------------------
 # 2. Security Group para permitir todo el tráfico
 # ---------------------------------------------------------
@@ -84,15 +80,15 @@ module "security_group" {
 # ---------------------------------------------------------
 
 
-# Net3 solo si create_temp_net = true
+# Net3: siempre presente; el acceso a Internet se controla con `has_internet`.
 module "networking3" {
   source = "./modules/network"
-  count  = var.create_temp_net ? 1 : 0
+  count  = 1
 
   network_name = "Net3"
   subnet_name  = "subnet3"
   cidr         = var.net3_cidr
-  has_internet = true
+  has_internet = var.create_temp_net
 
   # En tu módulo de subnet asegúrate de exponer dns_nameservers/gateway si lo soporta.
   # Si tu módulo/network no soporta dns_nameservers/gateway, ver más abajo cómo añadir el recurso openstack_networking_subnet_v2 directamente.
@@ -106,8 +102,8 @@ module "backup_router" {
 
   router_name = "backup_router"
   # conectar a Net3: usa los outputs del módulo networking3
-  network_id  = try(module.networking3[0].network_id, "")
-  subnet_id   = try(module.networking3[0].subnet_id, "")
+  network_id  = module.networking3[0].network_id
+  subnet_id   = module.networking3[0].subnet_id
   ext_network = var.ext_network
   gateway     = cidrhost(var.net3_cidr, 1)
 }
@@ -126,9 +122,6 @@ module "db_bbdd" {
 
   network_id = module.networking2.network_id # Conectado a Net2
   # asign_multiple_network = true
-  asign_multiple_network = var.create_temp_net
-  second_network_id      = var.create_temp_net ? module.networking3[0].network_id : null
-
 
   # Configuraciones específicas
   user_data_file     = "./cloud-init-scripts/db_init.tpl"
@@ -138,9 +131,10 @@ module "db_bbdd" {
   db_user = var.db_user
   db_pass = var.db_pass
   db_name = var.db_name
-  depends_on = [
-    module.backup_router[0]
-  ]
+  asign_multiple_network = true
+  second_network_id      = module.networking3[0].network_id
+
+  # No explicit depends_on needed: module references create the necessary dependency.
 }
 
 module "object_storage" {
@@ -154,17 +148,15 @@ module "object_storage" {
   security_groups = [module.security_group.security_group_id]
 
   network_id             = module.networking2.network_id # Conectado a Net2
-  asign_multiple_network = var.create_temp_net
-  second_network_id      = var.create_temp_net ? module.networking3[0].network_id : null
+  asign_multiple_network = true
+  second_network_id      = module.networking3[0].network_id
 
 
   # Configuraciones específicas
   user_data_file     = "./cloud-init-scripts/object_storage_init.tpl"
   assign_floating_ip = false # BBDD no tiene salida a Internet/IP flotante [cite: 51]
 
-  depends_on = [
-    module.backup_router[0]
-  ]
+  # No explicit depends_on needed: module references create the necessary dependency.
 }
 # ---------------------------------------------------------
 # 4. SERVIDORES
@@ -277,61 +269,6 @@ module "loadbalancer" {
 # # ---------------------------------------------------------
 # # 6. FIREWALL (FWaaS) y GRUPOS DE SEGURIDAD
 # # ---------------------------------------------------------
-# Se asume que el router que conecta Net1 a ExtNet se creará aquí o en el módulo 'security'.
-# Por simplicidad, se puede implementar el firewall como un Security Group "open" en este nivel [cite: 120]
-# El módulo 'security' debería gestionar el FWaaS completo (reglas y políticas)[cite: 103].
-# module "firewall" {
-#   source = "./modules/firewall"
-#   # Le pasamos la ID de la red para asociar el router y el FWaaS
-#   name                   = "ssh_access"
-#   protocol               = "tcp"
-#   ssh_access             = "allow"
-#   destination_ip_address = module.admin_vm.internal_ip
-#   destination_port       = "2020"
-#   source_ip_address      = "0.0.0.0/0"
-
-#   rule1_name                   = "http_access"
-#   rule1_protocol               = "tcp"
-#   rule1_action                 = "allow"
-#   rule1_destination_ip_address = module.loadbalancer.loadbalancer_vip_address
-#   rule1_destination_port       = "80"
-#   rule1_source_ip_address      = "0.0.0.0/0"
-
-#   rule2_name              = "internal_access"
-#   rule2_protocol          = "any"
-#   rule2_action            = "allow"
-#   rule2_source_ip_address = "0.0.0.0/0"
-
-#   policy_ingress_name = "ingress_policy"
-
-#   policy_egress_name = "egress_policy"
-
-#   router_port_id = module.router.router_port_id
-
-#   group_name = "my_firewall_group"
-
-
-#   # ports = [
-#   #   module.admin_vm.port_id,
-#   #   module.loadbalancer.lb_port_id
-#   # ]
-
-#   ports = compact([
-#     module.admin_vm.port_id[0],
-#     module.loadbalancer.lb_port_id
-#   ])
-
-
-# }
-# module "firewall" {
-#   source         = "./modules/firewall"
-#   admin_ip       = module.admin_vm.internal_ip
-#   lb_ip          = module.loadbalancer.loadbalancer_vip_address
-#   router_port_id = module.router.router_port_id
-#   admin_port_id  = module.admin_vm.port_id[0]
-#   lb_port_id     = module.loadbalancer.lb_port_id
-# }
-
 module "firewall" {
   source = "./modules/firewall"
 
@@ -340,7 +277,7 @@ module "firewall" {
       name = "ssh_access"
       direction = "ingress"
       protocol  = "tcp"
-      action    = "allow"
+      action    = var.actions_ssh_admin
       destination_ip_address = module.admin_vm.internal_ip
       destination_port       = "2025"
     },
@@ -375,11 +312,6 @@ module "firewall" {
 
   ingress_firewall_policy_id = "ingress_policy"
   egress_firewall_policy_id  = "egress_policy"
-
-# ports = compact(flatten([
-#   [module.admin_vm.port_id],        # Convertimos el string a lista (1 elemento)
-#   module.loadbalancer.lb_port_id    # Ya es lista → OK
-# ]))
 
   ports = compact([
     module.admin_vm.port_id,

@@ -29,3 +29,5 @@ chmod 600 "$KEY" || true
 
 echo "Conectando a ${USER}@${admin_ip}:${PORT} ..."
 ssh -i "$KEY" -p "$PORT" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "${USER}@${admin_ip}"
+
+# ssh -i ./keys/admin_key.pem -p 2025 root@ip
