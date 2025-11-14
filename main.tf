@@ -376,7 +376,7 @@ module "firewall" {
 
   ports = compact([
     module.admin_vm.port_id,
-    module.loadbalancer.lb_port_id
+    # module.loadbalancer.lb_port_id
   ])
 
   depends_on = [

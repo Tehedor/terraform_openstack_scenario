@@ -49,8 +49,6 @@ help:
 		&& echo "  destroy_nodes        - Destruir nodos VNX" \
 		&& echo "" \
 		&& echo "OTROS / USO:" \
-		&& echo "  tar_create           - Generar tars en cloud_init_files/00_tar_files (Make target) if defined" \
-		&& echo "  tar_extract          - Extraer tars de cloud_init_files/00_tar_files (Make target) if defined" \
 		&& echo "  clean                - Limpiar (.terraform, lock)" \
 		&& echo "" \
 		&& echo "Ejemplos:" \
