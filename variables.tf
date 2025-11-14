@@ -16,7 +16,7 @@ variable "flavor_web" {
 variable "flavor_db" {
   description = "Flavor de la VM de la base de datos (puede ser más grande)"
   type        = string
-  default     = "m1.medium"
+  default     = "m1.tiny"
 }
 
 variable "key_pair_name" {
