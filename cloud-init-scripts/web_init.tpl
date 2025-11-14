@@ -6,6 +6,20 @@ packages:
   - php
   - php-mysql
 
+write_files:
+  - path: /etc/systemd/system/apache2.service.d/web_env.conf
+    owner: root:root
+    permissions: '0600'
+    content: |
+      [Service]
+      Environment="DB_HOST=${db_host}:3306"
+      Environment="DB_USER=${db_user}"
+      Environment="DB_PASS=${db_pass}"
+      Environment="DB_NAME=${db_name}"
+      Environment="PAGE_TITLE=${page_title}"
+      Environment="IP_OBJECT_STORAGE=${object_storage_host}"
+
+
 runcmd:
   # Clonar el repositorio y copiar solo la carpeta phpApp
   - [ bash, -lc, 'rm -f /var/www/html/index.html || true' ]
@@ -15,15 +29,15 @@ runcmd:
 
   # Crear drop-in systemd para variables de entorno (DB)
   - [ bash, -lc, 'mkdir -p /etc/systemd/system/apache2.service.d' ]
-  - [ bash, -lc, 'cat <<EOF > /etc/systemd/system/apache2.service.d/web_env.conf
-[Service]
-Environment="DB_HOST=${db_host}:3306"
-Environment="DB_USER=${db_user}"
-Environment="DB_PASS=${db_pass}"
-Environment="DB_NAME=${db_name}"
-Environment="PAGE_TITLE=${page_title}"
-Environment="IP_OBJECT_STORAGE=${object_storage_host}"
-EOF' ]
+#   - [ bash, -lc, 'cat <<EOF > /etc/systemd/system/apache2.service.d/web_env.conf
+# [Service]
+# Environment="DB_HOST=${db_host}:3306"
+# Environment="DB_USER=${db_user}"
+# Environment="DB_PASS=${db_pass}"
+# Environment="DB_NAME=${db_name}"
+# Environment="PAGE_TITLE=${page_title}"
+# Environment="IP_OBJECT_STORAGE=${object_storage_host}"
+# EOF' ]
   - [ bash, -lc, 'chmod 600 /etc/systemd/system/apache2.service.d/web_env.conf' ]
   - [ bash, -lc, 'chown root:root /etc/systemd/system/apache2.service.d/web_env.conf' ]
 
