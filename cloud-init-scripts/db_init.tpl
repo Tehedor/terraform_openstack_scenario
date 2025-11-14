@@ -2,7 +2,9 @@
 package_update: true
 packages:
   - mysql-server
-  - git
+  # - git
+
+
 
 write_files:
   - path: /root/init-db.sh
@@ -10,14 +12,39 @@ write_files:
     content: |
       #!/bin/bash
       mysql -e "CREATE DATABASE IF NOT EXISTS ${db_name} CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"
-      mysql ${db_name} < /tmp/web_clone/mysql/init-data.sql
+      mysql ${db_name} < /tmp/init-data.sql
       mysql -e "CREATE USER IF NOT EXISTS '${db_user}'@'%' IDENTIFIED BY '${db_pass}';"
       mysql -e "GRANT ALL PRIVILEGES ON ${db_name}.* TO '${db_user}'@'%';"
       mysql -e "FLUSH PRIVILEGES;"
 
+  - path: /tmp/init-data.sql
+    permissions: '0755'
+    content: |
+      SET NAMES utf8;
+      SET FOREIGN_KEY_CHECKS = 0;
+
+      -- -------------------------------------------------
+      -- Estructura de tabla para la tabla `usuarios`
+      -- -------------------------------------------------
+      DROP TABLE IF EXISTS `usuarios`;
+      CREATE TABLE IF NOT EXISTS `usuarios` (
+          `id` int(11) NOT NULL AUTO_INCREMENT,
+          `username` varchar(255)  NOT NULL,
+          `email` varchar(255)  NOT NULL,
+          PRIMARY KEY (`id`)
+      ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+      -- ----------------------------
+      --  Registros `usuarios`
+      -- ----------------------------
+
+      INSERT INTO `usuarios` (`username`, `email`) VALUES
+      ('user', 'user@gmail.com'),
+      ('admin', 'admin@gmail.com');
+
 runcmd:
   - mkdir -p /tmp/web_clone
-  - git clone https://github.com/Tehedor/web_php_basica.git /tmp/web_clone
+  # - git clone https://github.com/Tehedor/web_php_basica.git /tmp/web_clone
   - systemctl enable mysql
   - systemctl start mysql
   - sleep 5
