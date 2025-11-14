@@ -93,6 +93,11 @@ deploy_test: check
 # 	@terraform state pull | jq -r '.modules[] | .path[1:] as $module | .outputs | to_entries[] | "\($module).\(.key)=\(.value.value)"' > outputs.txt
 	@echo "🎉 ARQUITECTURA COMPLETA DESPLEGADA con éxito."
 
+deploy_no_net3: check
+	@echo "🌟 INICIANDO DESPLIEGUE COMPLETO DE ARQUITECTURA SIN RED TEMPORAL"
+	@terraform apply -auto-approve -var="create_temp_net=false"
+	@echo "🎉 ARQUITECTURA FINAL DESPLEGADA SIN RED TEMPORAL con éxito."
+
 # ---------------------------------------------------------
 # OBJETIVOS ESPECÍFICOS DE DESPLIEGUE (Usando -target)
 # ---------------------------------------------------------
