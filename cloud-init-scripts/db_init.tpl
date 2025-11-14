@@ -12,12 +12,12 @@ write_files:
     content: |
       #!/bin/bash
       mysql -e "CREATE DATABASE IF NOT EXISTS ${db_name} CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"
-      mysql ${db_name} < /tmp/init-data.sql
+      mysql ${db_name} < /root/init-data.sql
       mysql -e "CREATE USER IF NOT EXISTS '${db_user}'@'%' IDENTIFIED BY '${db_pass}';"
       mysql -e "GRANT ALL PRIVILEGES ON ${db_name}.* TO '${db_user}'@'%';"
       mysql -e "FLUSH PRIVILEGES;"
 
-  - path: /tmp/init-data.sql
+  - path: /root/init-data.sql
     permissions: '0755'
     content: |
       SET NAMES utf8;
@@ -43,7 +43,7 @@ write_files:
       ('admin', 'admin@gmail.com');
 
 runcmd:
-  - mkdir -p /tmp/web_clone
+  # - mkdir -p /tmp/web_clone
   # - git clone https://github.com/Tehedor/web_php_basica.git /tmp/web_clone
   - systemctl enable mysql
   - systemctl start mysql
