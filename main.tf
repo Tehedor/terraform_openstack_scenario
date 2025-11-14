@@ -375,7 +375,6 @@ module "firewall" {
   egress_firewall_policy_id  = "egress_policy"
 
   ports = compact([
-    module.router.router_port_id,
     module.admin_vm.port_id,
     module.loadbalancer.lb_port_id
   ])
