@@ -119,7 +119,7 @@ module "db_bbdd" {
 
   name   = "BBDD"
   image  = var.image_base_name
-  flavor = var.flavor_web
+  flavor = var.flavor_db
   security_groups = [module.security_group.security_group_id]
   # key_pair = var.key_pair_name
   # key_pair = ""
@@ -148,7 +148,7 @@ module "object_storage" {
 
   name   = "ObjectStorage"
   image  = var.image_base_name
-  flavor = var.flavor_web
+  flavor = var.flavor_db
   # key_pair = var.key_pair_name
   # key_pair = ""
   security_groups = [module.security_group.security_group_id]

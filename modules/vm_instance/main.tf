@@ -81,7 +81,7 @@ resource "openstack_compute_floatingip_associate_v2" "fip_assoc" {
   count       = var.assign_floating_ip ? 1 : 0
   floating_ip = openstack_networking_floatingip_v2.fip[0].address
   instance_id = openstack_compute_instance_v2.vm.id
-  # port_id     = openstack_compute_instance_v2.vm.network[0].port
+  port_id     = openstack_compute_instance_v2.vm.network[0].port
 }
 
 
