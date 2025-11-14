@@ -83,7 +83,8 @@ module "security_group" {
 # Net3: siempre presente; el acceso a Internet se controla con `has_internet`.
 module "networking3" {
   source = "./modules/network"
-  count  = 1
+  count  = var.create_temp_net ? 1 : 0
+
 
   network_name = "Net3"
   subnet_name  = "subnet3"
@@ -131,8 +132,8 @@ module "db_bbdd" {
   db_user = var.db_user
   db_pass = var.db_pass
   db_name = var.db_name
-  asign_multiple_network = true
-  second_network_id      = module.networking3[0].network_id
+  asign_multiple_network = var.create_temp_net
+  second_network_id      = var.create_temp_net ? module.networking3[0].network_id : null  
 
   # No explicit depends_on needed: module references create the necessary dependency.
 }
@@ -148,8 +149,8 @@ module "object_storage" {
   security_groups = [module.security_group.security_group_id]
 
   network_id             = module.networking2.network_id # Conectado a Net2
-  asign_multiple_network = true
-  second_network_id      = module.networking3[0].network_id
+  asign_multiple_network = var.create_temp_net
+  second_network_id      = var.create_temp_net ? module.networking3[0].network_id : null  
 
 
   # Configuraciones específicas
