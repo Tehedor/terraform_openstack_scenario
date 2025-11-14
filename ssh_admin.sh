@@ -1,0 +1,1 @@
+ssh -i ./keys/admin_key.pem -p 2025 root@
