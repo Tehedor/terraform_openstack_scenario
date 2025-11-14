@@ -2,11 +2,9 @@
 package_update: true
 packages:
   - mysql-server
-  # - git
-
-
 
 write_files:
+  # Script para inicializar la base de datos
   - path: /root/init-db.sh
     permissions: '0755'
     content: |
@@ -17,6 +15,7 @@ write_files:
       mysql -e "GRANT ALL PRIVILEGES ON ${db_name}.* TO '${db_user}'@'%';"
       mysql -e "FLUSH PRIVILEGES;"
 
+  # Datos de ejemplo
   - path: /root/init-data.sql
     permissions: '0755'
     content: |
@@ -37,17 +36,29 @@ write_files:
       -- ----------------------------
       --  Registros `usuarios`
       -- ----------------------------
-
       INSERT INTO `usuarios` (`username`, `email`) VALUES
       ('user', 'user@gmail.com'),
       ('admin', 'admin@gmail.com');
 
+  # Configuración ligera para MySQL (evita que OOM killer lo mate)
+  - path: /etc/mysql/mysql.conf.d/mysqld_small.cnf
+    permissions: '0644'
+    content: |
+      [mysqld]
+      innodb_buffer_pool_size = 32M
+      key_buffer_size = 8M
+      max_connections = 10
+      query_cache_size = 0
+      table_open_cache = 64
+      tmp_table_size = 16M
+      max_heap_table_size = 16M
+
 runcmd:
-  # - mkdir -p /tmp/web_clone
-  # - git clone https://github.com/Tehedor/web_php_basica.git /tmp/web_clone
+  # Configura bind-address antes de arrancar MySQL
+  - sed -i "s/^bind-address.*/bind-address = 0.0.0.0/" /etc/mysql/mysql.conf.d/mysqld.cnf
+  # Habilita y arranca MySQL
   - systemctl enable mysql
   - systemctl start mysql
-  - sleep 5
+  - sleep 10
+  # Ejecuta script de inicialización
   - bash /root/init-db.sh
-  - sed -i "s/^bind-address.*/bind-address = 0.0.0.0/" /etc/mysql/mysql.conf.d/mysqld.cnf
-  - systemctl restart mysql
