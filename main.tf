@@ -176,7 +176,7 @@ module "admin_vm" {
   name            = "ADMIN"
   image           = var.image_base_name
   flavor          = var.flavor_web
-  
+
   create_keypair = true
   key_pair        = var.key_pair_name
   security_groups = [module.security_group.security_group_id]
@@ -376,10 +376,14 @@ module "firewall" {
   ingress_firewall_policy_id = "ingress_policy"
   egress_firewall_policy_id  = "egress_policy"
 
-  ports = compact([
-    module.admin_vm.port_id,
-    # module.loadbalancer.lb_port_id
-  ])
+  # ports = compact([
+  #   module.admin_vm.port_id[0],
+  #   module.loadbalancer.lb_port_id
+  # ])
+  ports = [
+    module.admin_vm.port_id[0],
+    module.loadbalancer.lb_port_id
+  ]
 
   depends_on = [
     module.router,

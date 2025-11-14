@@ -38,8 +38,8 @@ runcmd:
 # Environment="PAGE_TITLE=${page_title}"
 # Environment="IP_OBJECT_STORAGE=${object_storage_host}"
 # EOF' ]
-  - [ bash, -lc, 'chmod 600 /etc/systemd/system/apache2.service.d/web_env.conf' ]
-  - [ bash, -lc, 'chown root:root /etc/systemd/system/apache2.service.d/web_env.conf' ]
+  # - [ bash, -lc, 'chmod 600 /etc/systemd/system/apache2.service.d/web_env.conf' ]
+  # - [ bash, -lc, 'chown root:root /etc/systemd/system/apache2.service.d/web_env.conf' ]
 
   # Recargar systemd y reiniciar Apache
   - [ bash, -lc, 'systemctl daemon-reload' ]

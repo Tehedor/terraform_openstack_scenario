@@ -29,7 +29,7 @@ output "loadbalancer_lb_port_id" {
 }
 
 output "admin_port" {
-  value = module.admin_vm.port_id
+  value = module.admin_vm.port_id[0]
 }
 
 # output "admin_key_private" {

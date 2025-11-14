@@ -55,7 +55,7 @@ resource "openstack_compute_instance_v2" "vm" {
   # User data con plantilla condicional
 
   user_data = var.user_data_file != "" ? templatefile(var.user_data_file, {
-    page_title          = var.name
+    page_title          = var.name != null ? var.name : ""
     db_host             = var.db_host != null ? var.db_host : ""
     db_user             = var.db_user != null ? var.db_user : ""
     db_pass             = var.db_pass != null ? var.db_pass : ""
