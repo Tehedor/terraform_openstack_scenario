@@ -24,16 +24,17 @@ resource "openstack_fw_rule_v2" "rule" {
 resource "openstack_fw_policy_v2" "policy" {
   count = length(var.fw_policy)
 
-  name = lookup(var.fw_policy[count.index], "name", "default_policy_name")
+  name = var.fw_policy[count.index].name
 
-  # # Se asocia a reglas existentes
-  # rules = [
-  #   for r in lookup(var.fw_policy[count.index], "rules", []) :
-  #   try(openstack_fw_rule_v2.rule[*].id[lookup([for rr in openstack_fw_rule_v2.rule[*].name : rr], r, 0)], null)
-  # ]
+  # Mapea nombres de reglas → IDs
   rules = [
-    openstack_fw_rule_v2.rule[0].id,
-    openstack_fw_rule_v2.rule[1].id
+    for r in var.fw_policy[count.index].rules :
+    openstack_fw_rule_v2.rule[
+      index(
+        [for rr in openstack_fw_rule_v2.rule : rr.name],
+        r
+      )
+    ].id
   ]
 }
 
@@ -41,9 +42,8 @@ resource "openstack_fw_policy_v2" "policy" {
 resource "openstack_fw_group_v2" "firewall_group" {
   name = var.name
 
-  ingress_firewall_policy_id = var.ingress_firewall_policy_id
-  egress_firewall_policy_id  = var.egress_firewall_policy_id
+  ingress_firewall_policy_id = openstack_fw_policy_v2.policy[0].id
+  egress_firewall_policy_id  = openstack_fw_policy_v2.policy[1].id
 
   ports = var.ports
-
 }
