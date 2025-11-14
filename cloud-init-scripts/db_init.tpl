@@ -52,6 +52,6 @@ runcmd:
   # Habilita y arranca MySQL
   - systemctl enable mysql
   - systemctl start mysql
-  - sleep 10
+  - sleep 15
   # Ejecuta script de inicialización
   - bash /root/init-db.sh
