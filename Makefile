@@ -205,6 +205,16 @@ extract_key:
 	@printf 'export admin_ip="%s"\n' "$$(terraform output -raw admin_ssh_ip)" > ./keys/admin_ssh_ip.sh
 	@echo "✅ Clave privada guardada en ./keys/my_key.pem"
 
+ssh_deny:
+	@echo "🚫 Denegando acceso SSH al servidor ADMIN..."
+	@terraform apply -auto-approve -var="actions_ssh_admin=deny"
+	@echo "✅ Acceso SSH denegado."
+
+ssh_allow:
+	@echo "✅ Permitido acceso SSH al servidor ADMIN..."
+	@terraform apply -auto-approve -var="actions_ssh_admin=allow"
+	@echo "✅ Acceso SSH permitido."
+
 cp_keyhost:
 	@cp -r /mnt/tmp/openstack_lab-antelope_4n_classic_ovs-v04/shared/keys/* ./keys/
 
