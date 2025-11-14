@@ -376,7 +376,7 @@ module "firewall" {
 
   ports = compact([
     module.router.router_port_id,
-    module.admin_vm.port_id[0],
+    module.admin_vm.port_id,
     module.loadbalancer.lb_port_id
   ])
 
