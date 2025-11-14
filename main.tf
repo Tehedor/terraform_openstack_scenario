@@ -279,17 +279,17 @@ module "firewall" {
       direction = "ingress"
       protocol  = "tcp"
       action    = var.actions_ssh_admin
-      # destination_ip_address = module.admin_vm.internal_ip
+      destination_ip_address = module.admin_vm.internal_ip
       destination_port       = "2025"
     },
-    {
-      name = "http_access"
-      direction = "ingress"
-      protocol  = "tcp"
-      action    = "allow"
-      # destination_ip_address = module.loadbalancer.loadbalancer_vip_address
-      destination_port       = "80"
-    },
+    # {
+    #   name = "http_access"
+    #   direction = "ingress"
+    #   protocol  = "tcp"
+    #   action    = "allow"
+    #   destination_ip_address = module.loadbalancer.loadbalancer_vip_address
+    #   destination_port       = "80"
+    # },
     {
       name = "internal_access"
       direction = "egress"
@@ -303,7 +303,7 @@ module "firewall" {
   fw_policy = [
     {
       name  = "ingress_policy"
-      rules = ["ssh_access", "http_access"]
+      rules = ["ssh_access"]
     },
     {
       name  = "egress_policy"
@@ -322,6 +322,61 @@ module "firewall" {
   depends_on = [
     module.router,
     module.admin_vm,
-    module.loadbalancer
+    # module.loadbalancer
   ]
 }
+# module "firewall" {
+#   source = "./modules/firewall"
+
+#   fw_rules = [
+#     {
+#       name = "ssh_access"
+#       direction = "ingress"
+#       protocol  = "tcp"
+#       action    = var.actions_ssh_admin
+#       destination_ip_address = module.admin_vm.internal_ip
+#       destination_port       = "2025"
+#     },
+#     {
+#       name = "http_access"
+#       direction = "ingress"
+#       protocol  = "tcp"
+#       action    = "allow"
+#       destination_ip_address = module.loadbalancer.loadbalancer_vip_address
+#       destination_port       = "80"
+#     },
+#     {
+#       name = "internal_access"
+#       direction = "egress"
+#       protocol  = "any"
+#       action    = "allow"
+#       # source_ip_address = "0.0.0.0/0"
+#       source_ip_address = "10.1.1.0/24"
+#     }
+#   ]
+
+#   fw_policy = [
+#     {
+#       name  = "ingress_policy"
+#       rules = ["ssh_access", "http_access"]
+#     },
+#     {
+#       name  = "egress_policy"
+#       rules = ["internal_access"]
+#     }
+#   ]
+
+#   ingress_firewall_policy_id = "ingress_policy"
+#   egress_firewall_policy_id  = "egress_policy"
+
+#   ports = compact([
+#     module.admin_vm.port_id,
+#     # module.loadbalancer.lb_port_id
+#   ])
+
+#   depends_on = [
+#     module.router,
+#     module.admin_vm,
+#     module.loadbalancer
+#   ]
+# }
