@@ -29,13 +29,13 @@ variable "key_pair_name" {
 variable "net1_cidr" {
   description = "CIDR para la red Net1 (servidores web, admin, lb)"
   type        = string
-  default     = "10.1.2.0/24"
+  default     = "10.1.1.0/24"
 }
 
 variable "net2_cidr" {
   description = "CIDR para la red Net2 (bbdd, storage)"
   type        = string
-  default     = "10.1.3.0/24"
+  default     = "10.1.2.0/24"
 }
 
 variable "lb_name" {
@@ -89,5 +89,6 @@ variable "create_temp_net" {
 variable "net3_cidr" {
   description = "CIDR para Net3 (solo para la BBDD temporalmente)."
   type        = string
-  default     = "10.1.1.0/24"
+  default     = "10.1.3.0/24"
 }
+

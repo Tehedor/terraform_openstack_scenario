@@ -37,3 +37,9 @@ variable "server_ips" {
   description = "Lista de IPs fijas de los servidores web que se añadirán al pool del balanceador"
   type        = list(string)
 }
+
+variable "assign_floating_ip" {
+  description = "Si es true, asigna una IP flotante al Load Balancer"
+  type        = bool
+  default     = false
+}

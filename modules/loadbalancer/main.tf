@@ -37,3 +37,16 @@ resource "openstack_lb_member_v2" "members_lb" {
   pool_id       = openstack_lb_pool_v2.pool_lb.id
   subnet_id     = var.subnet_id
 }
+
+
+resource "openstack_networking_floatingip_v2" "fip" {
+  count = var.assign_floating_ip ? 1 : 0
+  pool  = "ExtNet" # Pool por defecto de OpenStack/VNX
+}
+
+# # Asocia la Floating IP a la instancia
+resource "openstack_networking_floatingip_associate_v2" "fip_assoc" {
+  count         = var.assign_floating_ip ? 1 : 0
+  floating_ip = openstack_networking_floatingip_v2.fip[0].address
+  port_id       = openstack_lb_loadbalancer_v2.loadBalancer.vip_port_id
+}

@@ -1,84 +1,49 @@
 terraform {
-  # Aquí se declaran los proveedores requeridos para este módulo.
-  # `openstack` es el proveedor que permite a Terraform interactuar con
-  # una nube OpenStack (crear redes, subredes, instancias, etc.).
   required_providers {
     openstack = {
       source  = "terraform-provider-openstack/openstack"
-      version = "~> 1.53.0" # Restringe la versión del proveedor a la serie 1.53.x
+      version = "~> 1.53.0"
     }
   }
 }
 
-# Creates a firewall rule to allow SSH access on port 2020 from any IP address.
-resource "openstack_fw_rule_v2" "ssh_access" {
-  name                   = var.name
-  protocol               = var.protocol
-  action                 = var.ssh_access
-  destination_ip_address = var.destination_ip_address
-  destination_port       = var.destination_port
-  source_ip_address      = "0.0.0.0/0"
+
+resource "openstack_fw_rule_v2" "rule" {
+  count = length(var.fw_rules)
+
+  name      = lookup(var.fw_rules[count.index], "name", "default_rule_name")
+  protocol  = lookup(var.fw_rules[count.index], "protocol", "any")
+  action    = lookup(var.fw_rules[count.index], "action", "allow")
+
+  destination_ip_address = lookup(var.fw_rules[count.index], "destination_ip_address", null)
+  destination_port       = lookup(var.fw_rules[count.index], "destination_port", null)
+  source_ip_address      = lookup(var.fw_rules[count.index], "source_ip_address", null)
 }
 
-# Creates a firewall rule to allow HTTP access on port 80 from any IP address.
-resource "openstack_fw_rule_v2" "http_access" {
-  name                   = var.rule1_name
-  protocol               = var.rule1_protocol
-  action                 = var.rule1_action
-  destination_ip_address = var.rule1_destination_ip_address
-  destination_port       = var.rule1_destination_port
-  source_ip_address      = var.rule1_source_ip_address
+# Crea las políticas de firewall dinámicamente
+resource "openstack_fw_policy_v2" "policy" {
+  count = length(var.fw_policy)
+
+  name = lookup(var.fw_policy[count.index], "name", "default_policy_name")
+
+  # # Se asocia a reglas existentes
+  # rules = [
+  #   for r in lookup(var.fw_policy[count.index], "rules", []) :
+  #   try(openstack_fw_rule_v2.rule[*].id[lookup([for rr in openstack_fw_rule_v2.rule[*].name : rr], r, 0)], null)
+  # ]
+  rules = [
+    openstack_fw_rule_v2.rule[0].id,
+    openstack_fw_rule_v2.rule[1].id
+  ]
 }
 
-# Creates a firewall rule to allow internal access for any protocol from any IP address.
-resource "openstack_fw_rule_v2" "internal_access" {
-  name              = var.rule2_name
-  protocol          = var.rule2_protocol
-  action            = var.rule2_action
-  source_ip_address = var.rule2_source_ip_address
-}
-
-resource "openstack_networking_secgroup_v2" "my_security_group" {
-  name                 = "open"
-  description          = "Grupo de Seguridad para permitir todo el trafico"
-  delete_default_rules = true
-}
-
-resource "openstack_networking_secgroup_rule_v2" "security_group_rule_ingress" {
-  direction         = "ingress"
-  ethertype         = "IPv4"
-  protocol          = "tcp"
-  remote_ip_prefix  = "0.0.0.0/0"
-  security_group_id = openstack_networking_secgroup_v2.my_security_group.id
-}
-resource "openstack_networking_secgroup_rule_v2" "security_group_rule_engress" {
-  direction         = "egress"
-  ethertype         = "IPv4"
-  protocol          = "tcp"
-  remote_ip_prefix  = "0.0.0.0/0"
-  security_group_id = openstack_networking_secgroup_v2.my_security_group.id
-}
-
-
-# ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
-resource "openstack_fw_policy_v2" "ingress_policy" {
-  name = var.policy_ingress_name != "" ? var.policy_ingress_name : "ingress_policy"
-  # Opcional: añadid reglas aquí si el módulo las define o se importan de variables
-}
-
-resource "openstack_fw_policy_v2" "egress_policy" {
-  name = var.policy_egress_name != "" ? var.policy_egress_name : "egress_policy"
-  # Opcional: añadid reglas aquí si el módulo las define o se importan de variables
-}
-# ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
-
-# Creates a firewall group and associates it with the ingress and egress firewall policies.
+# Crea el grupo de firewall y asocia las políticas
 resource "openstack_fw_group_v2" "firewall_group" {
-  name = var.group_name
+  name = var.name
 
-  ingress_firewall_policy_id = openstack_fw_policy_v2.ingress_policy.id
-  egress_firewall_policy_id  = openstack_fw_policy_v2.egress_policy.id
+  ingress_firewall_policy_id = var.ingress_firewall_policy_id
+  egress_firewall_policy_id  = var.egress_firewall_policy_id
 
-  # ports = [var.router_port_id]
-  ports = concat([var.router_port_id], var.ports)
+  ports = var.ports
+
 }

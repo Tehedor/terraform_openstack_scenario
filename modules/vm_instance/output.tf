@@ -23,7 +23,7 @@ output "floating_ip" {
 
 # Puerto principal de la instancia (para usar en FWaaS u otras asociaciones)
 output "port_id" {
-  value = openstack_compute_instance_v2.vm[*].network[0].port
+  value = openstack_compute_instance_v2.vm.network[0].port
 }
 
 
