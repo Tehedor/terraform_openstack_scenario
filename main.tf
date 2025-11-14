@@ -64,53 +64,54 @@ module "router" {
 # ---------------------------------------------------------
 # 2. Security Group para permitir todo el tráfico
 # ---------------------------------------------------------
-module "security_group" {
-  source              = "./modules/secGroup"
-  security_group_name = "open"
-  description         = "Grupo de Seguridad para permitir todo el trafico"
-  # description = "An example security group for demonstration purposes"
+  module "security_group" {
+    source              = "./modules/secGroup"
+    security_group_name = "open"
+    description         = "Grupo de Seguridad para permitir todo el trafico"
+    # description = "An example security group for demonstration purposes"
 
-  security_group_rules = [
-    {
-      direction        = "ingress"
-      ethertype        = "IPv4"
-      protocol         = "any"
-      remote_ip_prefix = "0.0.0.0/0"
-    },
-    {
-      direction        = "egress"
-      ethertype        = "IPv4"
-      protocol         = "any"
-      remote_ip_prefix = "0.0.0.0/0"
-    }
-  ]
-  # security_group_rules = [
-  #   {
-  #     direction        = "ingress"
-  #     ethertype        = "IPv4"
-  #     protocol         = "tcp"
-  #     remote_ip_prefix = "0.0.0.0/0"
-  #   },
-  #   {
-  #     direction        = "egress"
-  #     ethertype        = "IPv4"
-  #     protocol         = "tcp"
-  #     remote_ip_prefix = "0.0.0.0/0"
-  #   },
-  #   {
-  #     direction        = "ingress"
-  #     ethertype        = "IPv4"
-  #     protocol         = "udp"
-  #     remote_ip_prefix = "0.0.0.0/0"
-  #   },
-  #   {
-  #     direction        = "egress"
-  #     ethertype        = "IPv4"
-  #     protocol         = "udp"
-  #     remote_ip_prefix = "0.0.0.0/0"
-  #   }
-  # ]
-}
+
+    security_group_rules = [
+      {
+        direction        = "ingress"
+        ethertype        = "IPv4"
+        protocol         = "tcp"
+        remote_ip_prefix = "0.0.0.0/0"
+      },
+      {
+        direction        = "egress"
+        ethertype        = "IPv4"
+        protocol         = "tcp"
+        remote_ip_prefix = "0.0.0.0/0"
+      },
+      {
+        direction        = "ingress"
+        ethertype        = "IPv4"
+        protocol         = "udp"
+        remote_ip_prefix = "0.0.0.0/0"
+      },
+      {
+        direction        = "egress"
+        ethertype        = "IPv4"
+        protocol         = "udp"
+        remote_ip_prefix = "0.0.0.0/0"
+      },
+      {
+        direction        = "ingress"
+        ethertype        = "IPv4"
+        protocol         = "any"
+        remote_ip_prefix = var.net2_cidr
+      },
+
+      # EGRESS: permitir TODO dentro de Net2
+      {
+        direction        = "egress"
+        ethertype        = "IPv4"
+        protocol         = "any"
+        remote_ip_prefix = var.net2_cidr
+      }
+    ]
+  }
 
 
 
