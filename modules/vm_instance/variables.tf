@@ -31,6 +31,11 @@ variable "key_pair" {
   type        = string
   default     = ""
 }
+variable "create_keypair" {
+  description = "Si true, crear un keypair en OpenStack y devolver la private_key."
+  type        = bool
+  default     = false
+}
 
 variable "security_groups" {
   description = "Nombre de los Security Groups a asignar a la VM"

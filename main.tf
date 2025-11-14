@@ -176,6 +176,8 @@ module "admin_vm" {
   name            = "ADMIN"
   image           = var.image_base_name
   flavor          = var.flavor_web
+  
+  create_keypair = true
   key_pair        = var.key_pair_name
   security_groups = [module.security_group.security_group_id]
   # security_groups = [openstack_networking_secgroup_v2.my_security_group.id]

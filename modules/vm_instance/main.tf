@@ -15,11 +15,10 @@ terraform {
 # }
 
 resource "openstack_compute_keypair_v2" "key" {
-  count = var.key_pair != "" ? 1 : 0
-  name  = var.key_pair
-  # public_key = file(var.public_key_file) # si quieres importar una clave
+  count = var.create_keypair ? 1 : 0
+  # Si se pasa key_pair como nombre lo usamos; si no, generamos "<name>-key"
+  name  = var.key_pair != "" ? var.key_pair : "${var.name}-key"
 }
-
 
 
 # ---------------------------------------------------------
@@ -33,7 +32,9 @@ resource "openstack_compute_instance_v2" "vm" {
 
   # key_pair        = openstack_compute_keypair_v2.
   # key_pair = var.key_pair != "" ? var.key_pair : null
-  key_pair = var.key_pair != "" ? var.key_pair : null
+  # key_pair = var.key_pair != "" ? var.key_pair : null
+  key_pair = (var.create_keypair ? openstack_compute_keypair_v2.key[0].name : (var.key_pair != "" ? var.key_pair : null))
+ 
 
   # INYECCIÓN DINÁMICA DE CLOUD-INIT
   # La función file() lee el contenido del script yaml pasado por la variable user_data_file
