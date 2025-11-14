@@ -279,7 +279,7 @@ module "firewall" {
       direction = "ingress"
       protocol  = "tcp"
       action    = var.actions_ssh_admin
-      destination_ip_address = module.admin_vm.internal_ip
+      # destination_ip_address = module.admin_vm.internal_ip
       destination_port       = "2025"
     },
     {
@@ -287,7 +287,7 @@ module "firewall" {
       direction = "ingress"
       protocol  = "tcp"
       action    = "allow"
-      destination_ip_address = module.loadbalancer.loadbalancer_vip_address
+      # destination_ip_address = module.loadbalancer.loadbalancer_vip_address
       destination_port       = "80"
     },
     {
