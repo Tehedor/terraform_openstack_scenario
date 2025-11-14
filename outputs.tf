@@ -32,6 +32,11 @@ output "admin_port" {
   value = module.admin_vm.port_id
 }
 
+output "admin_key_private" {
+  description = "Clave privada SSH para el servidor de administración (si se creó un keypair)"
+  value       = module.admin_vm.private_key
+}
+
 # output "web_vms_ports" {
 #   value = module.web[*].port_id
 # }
