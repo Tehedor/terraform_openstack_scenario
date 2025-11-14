@@ -12,23 +12,36 @@ write_files:
       # Crea la base de datos y el usuario
       mysql -e "CREATE DATABASE IF NOT EXISTS ${db_name} CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"
       mysql -e "CREATE USER IF NOT EXISTS '${db_user}'@'%' IDENTIFIED BY '${db_pass}';"
-      # mysql ${db_name} < /root/init-data.sql
-      # mysql -e "GRANT ALL PRIVILEGES ON ${db_name}.* TO '${db_user}'@'%';"
-      # mysql -e "FLUSH PRIVILEGES;"
+      mysql ${db_name} < /root/init-data.sql
+      mysql -e "GRANT ALL PRIVILEGES ON ${db_name}.* TO '${db_user}'@'%';"
+      mysql -e "FLUSH PRIVILEGES;"
 
-  # Configuración ligera de MySQL para VMs con poca RAM
-  - path: /etc/mysql/mysql.conf.d/mysqld_small.cnf
+  # # Configuración ligera de MySQL para VMs con poca RAM
+  - path: /root/init-data.sql
     permissions: '0644'
     content: |
-      [mysqld]
-      innodb_buffer_pool_size = 16M
-      key_buffer_size = 4M
-      max_connections = 5
-      query_cache_size = 0
-      table_open_cache = 32
-      tmp_table_size = 8M
-      max_heap_table_size = 8M
-      skip_name_resolve = 1
+      -- -------------------------------------------------
+      SET NAMES utf8;
+      SET FOREIGN_KEY_CHECKS = 0;
+
+      -- -------------------------------------------------
+      -- Estructura de tabla para la tabla `usuarios`
+      -- -------------------------------------------------
+      DROP TABLE IF EXISTS `usuarios`;
+      CREATE TABLE IF NOT EXISTS `usuarios` (
+          `id` int(11) NOT NULL AUTO_INCREMENT,
+          `username` varchar(255)  NOT NULL,
+          `email` varchar(255)  NOT NULL,
+          PRIMARY KEY (`id`)
+      ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+      -- ----------------------------
+      --  Registros `usuarios`
+      -- ----------------------------
+
+      INSERT INTO `usuarios` (`username`, `email`) VALUES
+      ('user', 'user@gmail.com'),
+      ('admin', 'admin@gmail.com');
 
 runcmd:
   # Detener servicios innecesarios para liberar RAM
@@ -38,7 +51,7 @@ runcmd:
   - systemctl disable apport
 
   # Configurar bind-address antes de arrancar MySQL
-  - sed -i "s/^bind-address.*/bind-address = 0.0.0.0/" /etc/mysql/mysql.conf.d/mysqld.cnf
+  # - sed -i "s/^bind-address.*/bind-address = 0.0.0.0/" /etc/mysql/mysql.conf.d/mysqld.cnf
 
   # Arrancar MySQL
   - systemctl enable mysql

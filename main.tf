@@ -1,6 +1,32 @@
 # main.tf
 
 # ---------------------------------------------------------
+# 0. FLAVORS
+# ---------------------------------------------------------
+module "flavor_db" {
+  source = "./modules/flavor"  # Directorio donde tienes el módulo de flavor
+
+  # Parámetros del flavor
+  name       = "m1.db_1gb"
+  ram        = 1024    # 1 GB
+  vcpus      = 1
+  disk       = 10
+  swap       = 0
+  ephemeral  = 0
+  is_public  = true
+  extra_specs = {}
+
+  # Datos de autenticación OpenStack
+  auth_url    = "http://controller:5000/v3"
+  tenant_name = "admin"
+  username    = "admin"
+  password    = "xxxx"
+  region      = "RegionOne"
+
+}
+
+
+# ---------------------------------------------------------
 # 1. REDES (NET1 y NET2)
 # ---------------------------------------------------------
 # Módulo para crear Net1 (App/Admin)
@@ -116,7 +142,7 @@ module "db_bbdd" {
 
   name   = "BBDD"
   image  = var.image_base_name
-  flavor = var.flavor_db
+  flavor = module.flavor_db.flavor_name
   security_groups = [module.security_group.security_group_id]
   # key_pair = var.key_pair_name
   # key_pair = ""
