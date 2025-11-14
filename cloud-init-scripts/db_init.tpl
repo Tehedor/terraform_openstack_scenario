@@ -40,19 +40,6 @@ write_files:
   #     ('user', 'user@gmail.com'),
   #     ('admin', 'admin@gmail.com');
 
-  # Configuración ligera para MySQL (evita que OOM killer lo mate)
-  - path: /etc/mysql/mysql.conf.d/mysqld_small.cnf
-    permissions: '0644'
-    content: |
-      [mysqld]
-      innodb_buffer_pool_size = 16M
-      key_buffer_size = 4M
-      max_connections = 5
-      query_cache_size = 0
-      table_open_cache = 32
-      tmp_table_size = 8M
-      max_heap_table_size = 8M
-      skip_name_resolve = 1
 
 
 runcmd:
@@ -62,7 +49,6 @@ runcmd:
   - systemctl disable apport
 
   # Configura bind-address antes de arrancar MySQL
-  - sed -i "s/^bind-address.*/bind-address = 0.0.0.0/" /etc/mysql/mysql.conf.d/mysqld_small.cnf
   # Habilita y arranca MySQL
   - systemctl enable mysql
   - systemctl start mysql
