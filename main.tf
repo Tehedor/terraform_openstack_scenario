@@ -99,7 +99,7 @@ module "router" {
       {
         direction        = "ingress"
         ethertype        = "IPv4"
-        protocol         = "any"
+        protocol         = "null"
         remote_ip_prefix = var.net2_cidr
       },
 
@@ -107,7 +107,7 @@ module "router" {
       {
         direction        = "egress"
         ethertype        = "IPv4"
-        protocol         = "any"
+        protocol         = "null"
         remote_ip_prefix = var.net2_cidr
       }
     ]
