@@ -377,7 +377,7 @@ module "firewall" {
   egress_firewall_policy_id  = "egress_policy"
 
   ports = compact(flatten([
-    [module.admin_vm.port_id],   # convierte el string en lista con 1 elemento
+    [module.admin_vm.port_id[0]],   # convierte el string en lista con 1 elemento
     module.loadbalancer.lb_port_id
   ]))
 
