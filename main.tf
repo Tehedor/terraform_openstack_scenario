@@ -74,28 +74,42 @@ module "security_group" {
     {
       direction        = "ingress"
       ethertype        = "IPv4"
-      protocol         = "tcp"
+      protocol         = "any"
       remote_ip_prefix = "0.0.0.0/0"
     },
     {
       direction        = "egress"
       ethertype        = "IPv4"
-      protocol         = "tcp"
-      remote_ip_prefix = "0.0.0.0/0"
-    },
-    {
-      direction        = "ingress"
-      ethertype        = "IPv4"
-      protocol         = "udp"
-      remote_ip_prefix = "0.0.0.0/0"
-    },
-    {
-      direction        = "egress"
-      ethertype        = "IPv4"
-      protocol         = "udp"
+      protocol         = "any"
       remote_ip_prefix = "0.0.0.0/0"
     }
   ]
+  # security_group_rules = [
+  #   {
+  #     direction        = "ingress"
+  #     ethertype        = "IPv4"
+  #     protocol         = "tcp"
+  #     remote_ip_prefix = "0.0.0.0/0"
+  #   },
+  #   {
+  #     direction        = "egress"
+  #     ethertype        = "IPv4"
+  #     protocol         = "tcp"
+  #     remote_ip_prefix = "0.0.0.0/0"
+  #   },
+  #   {
+  #     direction        = "ingress"
+  #     ethertype        = "IPv4"
+  #     protocol         = "udp"
+  #     remote_ip_prefix = "0.0.0.0/0"
+  #   },
+  #   {
+  #     direction        = "egress"
+  #     ethertype        = "IPv4"
+  #     protocol         = "udp"
+  #     remote_ip_prefix = "0.0.0.0/0"
+  #   }
+  # ]
 }
 
 
@@ -169,7 +183,7 @@ module "object_storage" {
 
   name   = "ObjectStorage"
   image  = var.image_base_name
-  flavor = var.flavor_db
+  flavor = module.flavor_db.flavor_name
   # key_pair = var.key_pair_name
   # key_pair = ""
   security_groups = [module.security_group.security_group_id]
