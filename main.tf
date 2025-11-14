@@ -376,10 +376,10 @@ module "firewall" {
   ingress_firewall_policy_id = "ingress_policy"
   egress_firewall_policy_id  = "egress_policy"
 
-  ports = compact(
-    module.admin_vm.port_id,
-    flatten([module.loadbalancer.lb_port_id]),
-  )
+  ports = compact(flatten([
+    [module.admin_vm.port_id],   # convierte el string en lista con 1 elemento
+    module.loadbalancer.lb_port_id
+  ]))
 
   depends_on = [
     module.router,
