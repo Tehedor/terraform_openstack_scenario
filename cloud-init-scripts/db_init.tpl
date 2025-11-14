@@ -45,7 +45,7 @@ runcmd:
   - systemctl start mysql
 
   # Espera que MySQL esté completamente estable
-  - sleep 60
+  - sleep 120
 
   # Ejecutar inicialización mínima después de que MySQL esté listo
   - /root/init-db.sh
