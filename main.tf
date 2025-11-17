@@ -94,16 +94,6 @@ module "security_group" {
       ethertype        = "IPv4"
       protocol         = "udp"
       remote_ip_prefix = "0.0.0.0/0"
-    },
-    {
-      direction        = "ingress"   # Entrada al servidor
-      ethertype        = "IPv4"      # Protocolo IPv4
-      protocol         = "tcp"       # MySQL usa TCP
-      port_range_min   = 3306        # Puerto inicial (3306)
-      port_range_max   = 3306        # Puerto final (3306)
-      remote_ip_prefix = "0.0.0.0/0" # Permite la conexión desde cualquier IP
-      # **NOTA DE SEGURIDAD:** # Considera reemplazar "0.0.0.0/0" por la IP o el CIDR de tus servidores de aplicación 
-      # para mayor seguridad. Por ejemplo: "192 .168.1.10/32".
     }
   ]
   # security_group_rules = [
