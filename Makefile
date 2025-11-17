@@ -225,7 +225,7 @@ ssh_allow:
 
 sshAdmin:
 	@echo "🔧 Configurando acceso SSH al servidor ADMIN..."
-	@. ./keys/admin_ssh_ip.sh && ssh -i keys/admin_key.pem root@${admin_ip}
+	@bash ./keys/admin_ssh_ip.sh && ssh -i keys/admin_key.pem root@${admin_ip}
 	@echo "✅ Acceso SSH configurado."
 
 
