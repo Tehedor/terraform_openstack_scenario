@@ -85,7 +85,7 @@ destroy_all:
 
 deploy_all: check
 	@echo "🌟 INICIANDO DESPLIEGUE COMPLETO DE ARQUITECTURA CON RED TEMPORAL"
-	@terraform apply -auto-approve "
+	@terraform apply -auto-approve
 	@echo "⏳ Esperando a que la BBDD y el Object Storage terminen de configurarse..."
 	@sleep 120  # Espera 2 minutos (ajusta según el tiempo de cloud-init o instalación)
 	@echo "🧹 Eliminando la conexión temporal a Net1 (retirando acceso a Internet de la BBDD)"
