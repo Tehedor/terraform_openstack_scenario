@@ -200,7 +200,7 @@ destroy-firewall: init
 
 graph:  
 	@echo "🖼️  Generando graph.png (terraform graph -> dot)..."
-	@terraform graph | dot -Tpng -o graph.png
+	@python3 generate_graph.py png
 	@echo "✅ graph.png creado en $(PWD)/graph.png"
 
 
