@@ -44,14 +44,10 @@ write_files:
       ('admin', 'admin@gmail.com');
 
 runcmd:
-  # Detener servicios innecesarios para liberar RAM
-  - systemctl stop snapd
-  - systemctl disable snapd
-  - systemctl stop apport
-  - systemctl disable apport
+
 
   # Configurar bind-address antes de arrancar MySQL
-  # - sed -i "s/^bind-address.*/bind-address = 0.0.0.0/" /etc/mysql/mysql.conf.d/mysqld.cnf
+  - sed -i "s/^bind-address.*/bind-address = 0.0.0.0/" /etc/mysql/mysql.conf.d/mysqld.cnf
 
   # Arrancar MySQL
   - systemctl enable mysql
