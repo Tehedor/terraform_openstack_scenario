@@ -76,26 +76,43 @@ module "security_group" {
       ethertype        = "IPv4"
       protocol         = "tcp"
       remote_ip_prefix = "0.0.0.0/0"
-    },
-    {
-      direction        = "egress"
-      ethertype        = "IPv4"
-      protocol         = "tcp"
-      remote_ip_prefix = "0.0.0.0/0"
-    },
-    {
-      direction        = "ingress"
-      ethertype        = "IPv4"
-      protocol         = "udp"
-      remote_ip_prefix = "0.0.0.0/0"
-    },
-    {
-      direction        = "egress"
-      ethertype        = "IPv4"
-      protocol         = "udp"
-      remote_ip_prefix = "0.0.0.0/0"
+    },{
+      direction        = "ingress"          # Entrada al servidor
+      ethertype        = "IPv4"             # Protocolo IPv4
+      protocol         = "tcp"              # MySQL usa TCP
+      port_range_min   = 3306               # Puerto inicial (3306)
+      port_range_max   = 3306               # Puerto final (3306)
+      remote_ip_prefix = "0.0.0.0/0"        # Permite la conexión desde cualquier IP
+      # **NOTA DE SEGURIDAD:** # Considera reemplazar "0.0.0.0/0" por la IP o el CIDR de tus servidores de aplicación 
+      # para mayor seguridad. Por ejemplo: "192 .168.1.10/32".
     }
   ]
+  # security_group_rules = [
+  #   {
+  #     direction        = "ingress"
+  #     ethertype        = "IPv4"
+  #     protocol         = "tcp"
+  #     remote_ip_prefix = "0.0.0.0/0"
+  #   },
+  #   {
+  #     direction        = "egress"
+  #     ethertype        = "IPv4"
+  #     protocol         = "tcp"
+  #     remote_ip_prefix = "0.0.0.0/0"
+  #   },
+  #   {
+  #     direction        = "ingress"
+  #     ethertype        = "IPv4"
+  #     protocol         = "udp"
+  #     remote_ip_prefix = "0.0.0.0/0"
+  #   },
+  #   {
+  #     direction        = "egress"
+  #     ethertype        = "IPv4"
+  #     protocol         = "udp"
+  #     remote_ip_prefix = "0.0.0.0/0"
+  #   }
+  # ]
 }
 
 
@@ -296,61 +313,66 @@ module "loadbalancer" {
 # # ---------------------------------------------------------
 # # 6. FIREWALL (FWaaS) y GRUPOS DE SEGURIDAD
 # # ---------------------------------------------------------
-module "firewall" {
-  source = "./modules/firewall"
+# module "firewall" {
+#   source = "./modules/firewall"
 
-  fw_rules = [
-    {
-      name = "ssh_access"
-      direction = "ingress"
-      protocol  = "tcp"
-      action    = var.actions_ssh_admin
-      destination_ip_address = module.admin_vm.internal_ip
-      destination_port       = "2025"
-    },
-    # {
-    #   name = "http_access"
-    #   direction = "ingress"
-    #   protocol  = "tcp"
-    #   action    = "allow"
-    #   destination_ip_address = module.loadbalancer.loadbalancer_vip_address
-    #   destination_port       = "80"
-    # },
-    {
-      name = "internal_access"
-      direction = "egress"
-      protocol  = "any"
-      action    = "allow"
-      # source_ip_address = "0.0.0.0/0"
-      source_ip_address = "10.1.1.0/24"
-    }
-  ]
+#   fw_rules = [
+#     {
+#       name = "ssh_access"
+#       direction = "ingress"
+#       protocol  = "tcp"
+#       action    = var.actions_ssh_admin
+#       destination_ip_address = module.admin_vm.internal_ip
+#       destination_port       = "2025"
+#     },
+#     # {
+#     #   name = "http_access"
+#     #   direction = "ingress"
+#     #   protocol  = "tcp"
+#     #   action    = "allow"
+#     #   destination_ip_address = module.loadbalancer.loadbalancer_vip_address
+#     #   destination_port       = "80"
+#     # },
+#     {
+#       name = "internal_access"
+#       direction = "egress"
+#       protocol  = "any"
+#       action    = "allow"
+#       # source_ip_address = "0.0.0.0/0"
+#       source_ip_address = "10.1.1.0/24"
+#     }
+#   ]
 
-  fw_policy = [
-    {
-      name  = "ingress_policy"
-      rules = ["ssh_access"]
-    },
-    {
-      name  = "egress_policy"
-      rules = ["internal_access"]
-    }
-  ]
+#   fw_policy = [
+#     {
+#       name  = "ingress_policy"
+#       rules = ["ssh_access"]
+#     },
+#     {
+#       name  = "egress_policy"
+#       rules = ["internal_access"]
+#     }
+#   ]
 
-  ingress_firewall_policy_id = "ingress_policy"
-  egress_firewall_policy_id  = "egress_policy"
+#   ingress_firewall_policy_id = "ingress_policy"
+#   egress_firewall_policy_id  = "egress_policy"
 
-  ports = compact([
-    module.admin_vm.port_id,
-    # module.loadbalancer.lb_port_id
-  ])
+#   ports = compact([
+#     module.admin_vm.port_id,
+#     # module.loadbalancer.lb_port_id
+#   ])
 
-  depends_on = [
-    module.router,
-    module.admin_vm,
-    # module.loadbalancer
-  ]
-}
+#   depends_on = [
+#     module.router,
+#     module.admin_vm,
+#     # module.loadbalancer
+#   ]
+# }
+
+
+
+
+
 # module "firewall" {
 #   source = "./modules/firewall"
 

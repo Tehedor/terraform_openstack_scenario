@@ -6,14 +6,11 @@ variable "security_group_name" {
 
 variable "security_group_rules" {
   description = "A list of additional security group rules to apply."
-  type = list(object({
-    direction        = string
-    ethertype        = string
-    protocol         = string
-    remote_ip_prefix = string
-  }))
+  type    = list(map(any))
   default = []
 }
+
+
 variable "description" {
   type        = string
   description = "Description of the security group."
