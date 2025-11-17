@@ -225,7 +225,7 @@ ssh_allow:
 
 sshAdmin:
 	@echo "🔧 Conectando al servidor ADMIN..."
-	@bash -c 'source ./keys/admin_ssh_ip.sh && ssh -o StrictHostKeyChecking=no -i ./keys/admin_key.pem root@$$admin_ip'
+	@bash -c 'source ./keys/admin_ssh_ip.sh && ssh -p 2025 -i ./keys/admin_key.pem root@$$admin_ip'
 	@echo "✅ Acceso SSH configurado."
 
 
