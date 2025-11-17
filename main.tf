@@ -216,7 +216,7 @@ module "admin_vm" {
 module "web" {
   source = "./modules/vm_instance"
 
-  count = 3
+  count = var.web_servers_count
 
   name            = "s${count.index + 1}"
   image           = var.image_base_name

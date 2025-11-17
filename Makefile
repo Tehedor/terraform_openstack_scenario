@@ -22,6 +22,7 @@ help:
 		&& echo "  deploy-networking    - Desplegar redes y router (module.networking, networking2, router)" \
 		&& echo "  deploy-admin         - Desplegar servidor ADMIN (module.admin_vm)" \
 		&& echo "  deploy-webservers    - Desplegar servidores web (module.web)" \
+		&& echo "  deploy_numb_web_servers - Desplegar N servidores web (uso: make deploy_numb_web_servers 12)" \
 		&& echo "  deploy-db            - Desplegar Base de Datos (module.db_bbdd)" \
 		&& echo "  deploy-object_storage- Desplegar Object Storage (module.object_storage)" \
 		&& echo "  deploy-loadbalancer  - Desplegar Load Balancer (module.loadbalancer)" \
@@ -195,7 +196,7 @@ destroy-firewall: init
 # ---------------------------------------------------------
 # Create graph
 # ---------------------------------------------------------
-.PHONY: graph extract_key ssh_deny ssh_allow sshAdmin 
+.PHONY: graph extract_key ssh_deny ssh_allow sshAdmin deploy_numb_web_servers
 
 graph:  
 	@echo "🖼️  Generando graph.png (terraform graph -> dot)..."
@@ -223,11 +224,30 @@ ssh_allow:
 	@terraform apply -auto-approve -var="actions_ssh_admin=allow"
 	@echo "✅ Acceso SSH permitido."
 
+
 sshAdmin:
 	@echo "🔧 Conectando al servidor ADMIN..."
 	@bash -c 'source ./keys/admin_ssh_ip.sh && ssh -p 2025 -i ./keys/admin_key.pem root@$$admin_ip'
 	@echo "✅ Acceso SSH configurado."
 
+
+deploy_numb_web_servers:
+	@num=$(filter-out $@,$(MAKECMDGOALS)); \
+	if [ -z "$$num" ]; then \
+	  if [ -n "$(web_servers_count)" ]; then \
+	    num=$(web_servers_count); \
+	  else \
+	    echo "Uso: make deploy_numb_web_servers 12  (o make deploy_numb_web_servers web_servers_count=12)"; \
+	    exit 1; \
+	  fi; \
+	fi; \
+	@echo "🚀 Desplegando $$num servidores web..."; \
+	@terraform apply -auto-approve -var="web_servers_count=$$num"; \
+	@echo "✅ Despliegue de $$num servidores web completado."
+
+# catch-all para evitar error cuando pasas el número como segundo objetivo
+%:
+	@:
 
 # ---------------------------------------------------------
 # Nodos de openstack

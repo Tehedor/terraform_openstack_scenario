@@ -97,3 +97,10 @@ variable "actions_ssh_admin" {
   type        = string
   default     = "allow"
 }
+
+
+variable "web_servers_count" {
+  description = "Número de servidores web a crear"
+  type        = number
+  default     = 3
+}
