@@ -3,12 +3,34 @@
 # ---------------------------------------------------------
 # 0. FLAVORS
 # ---------------------------------------------------------
-module "flavor_db" {
+module "flavor_db_web" {
   source = "./modules/flavor" # Directorio donde tienes el módulo de flavor
 
   # Parámetros del flavor
   name        = "m1.db_1gb"
   ram         = 1024 # 1 GB
+  vcpus       = 1
+  disk        = 10
+  swap        = 0
+  ephemeral   = 0
+  is_public   = true
+  extra_specs = {}
+
+  # Datos de autenticación OpenStack
+  auth_url    = "http://controller:5000/v3"
+  tenant_name = "admin"
+  username    = "admin"
+  password    = "xxxx"
+  region      = "RegionOne"
+
+}
+
+module "flavor_storage" {
+  source = "./modules/flavor" # Directorio donde tienes el módulo de flavor
+
+  # Parámetros del flavor
+  name        = "m1.storage_1gb"
+  ram         = 2048 # 2 GB
   vcpus       = 1
   disk        = 10
   swap        = 0
@@ -168,7 +190,7 @@ module "db_bbdd" {
 
   name            = "BBDD"
   image           = var.image_base_name
-  flavor          = module.flavor_db.flavor_name
+  flavor          = module.flavor_db_web.flavor_name
   security_groups = [module.security_group.security_group_id]
   # key_pair = var.key_pair_name
   # key_pair = ""
@@ -195,7 +217,7 @@ module "object_storage" {
 
   name   = "ObjectStorage"
   image  = var.image_base_name
-  flavor = module.flavor_db.flavor_name
+  flavor = module.flavor_storage.flavor_name
   # key_pair = var.key_pair_name
   # key_pair = ""
   security_groups = [module.security_group.security_group_id]
@@ -237,25 +259,6 @@ module "admin_vm" {
   ssh_port           = 2025 # Requisito: Puerto SSH personalizado [cite: 149, 150]
 }
 
-# Servidores Web (S1, S2, S3) - Usando una cuenta dinámica para la escalabilidad
-# module "web" {
-#   source = "./modules/vm_instance"
-
-#   count = 3 # Despliega 3 servidores S1, S2, S3 [cite: 41]
-
-#   name     = "s${count.index + 1}"
-#   image    = var.image_base_name
-#   flavor   = var.flavor_web
-#   key_pair = var.key_pair_name
-
-#   network_id             = module.networking.network_id # Conectado a Net1
-#   asign_multiple_network = true
-#   second_network_id      = module.networking2.network_id # Conectado a Net2
-
-#   # Configuraciones específicas
-#   user_data_file     = "./cloud-init-scripts/web_init.tpl"
-#   assign_floating_ip = false
-# }
 module "web" {
   source = "./modules/vm_instance"
 
@@ -264,7 +267,7 @@ module "web" {
   name            = "s${count.index + 1}"
   image           = var.image_base_name
   # flavor          = var.flavor_web
-  flavor = module.flavor_db.flavor_name
+  flavor = module.flavor_db_web.flavor_name
   security_groups = [module.security_group.security_group_id]
 
 
@@ -276,15 +279,10 @@ module "web" {
   assign_floating_ip = false
 
   user_data_file = "./cloud-init-scripts/web_init.tpl"
-  # tar_file       = "${path.module}/cloud_init_files/00_tar_files/web_files.tar.gz"
-  // ...existing code...
-  # ...existing code...
-  # db_host        = var.db_host
   db_host = module.db_bbdd.internal_ip
   db_user = var.db_user
   db_pass = var.db_pass
   db_name = var.db_name
-
 
   object_storage_host = module.object_storage.internal_ip
 
@@ -302,7 +300,6 @@ module "web" {
 # # ---------------------------------------------------------
 # # 5. LOAD BALANCER (OCTAVIA)
 # # ---------------------------------------------------------
-# Usar los recursos nativos de Octavia (LBaaS) [cite: 98]
 module "loadbalancer" {
   source = "./modules/loadbalancer"
 
@@ -313,7 +310,6 @@ module "loadbalancer" {
   protocol      = "TCP"
   protocol_port = 80
   lb_method     = "ROUND_ROBIN"
-  # num_servers   = 3
   num_servers        = length(module.web)
   server_ips         = flatten(module.web[*].internal_ip)
   depends_on         = [module.web]
@@ -323,121 +319,6 @@ module "loadbalancer" {
 # # ---------------------------------------------------------
 # # 6. FIREWALL (FWaaS) y GRUPOS DE SEGURIDAD
 # # ---------------------------------------------------------
-# module "firewall" {
-#   source = "./modules/firewall"
-
-#   fw_rules = [
-#     {
-#       name = "ssh_access"
-#       direction = "ingress"
-#       protocol  = "tcp"
-#       action    = var.actions_ssh_admin
-#       destination_ip_address = module.admin_vm.internal_ip
-#       destination_port       = "2025"
-#     },
-#     # {
-#     #   name = "http_access"
-#     #   direction = "ingress"
-#     #   protocol  = "tcp"
-#     #   action    = "allow"
-#     #   destination_ip_address = module.loadbalancer.loadbalancer_vip_address
-#     #   destination_port       = "80"
-#     # },
-#     {
-#       name = "internal_access"
-#       direction = "egress"
-#       protocol  = "any"
-#       action    = "allow"
-#       # source_ip_address = "0.0.0.0/0"
-#       source_ip_address = "10.1.1.0/24"
-#     }
-#   ]
-
-#   fw_policy = [
-#     {
-#       name  = "ingress_policy"
-#       rules = ["ssh_access"]
-#     },
-#     {
-#       name  = "egress_policy"
-#       rules = ["internal_access"]
-#     }
-#   ]
-
-#   ingress_firewall_policy_id = "ingress_policy"
-#   egress_firewall_policy_id  = "egress_policy"
-
-#   ports = compact([
-#     module.admin_vm.port_id,
-#     # module.loadbalancer.lb_port_id
-#   ])
-
-#   depends_on = [
-#     module.router,
-#     module.admin_vm,
-#     # module.loadbalancer
-#   ]
-# }
-
-
-# module "firewall" {
-#   source = "./modules/firewall"
-
-#   fw_rules = [
-#     {
-#       name = "ssh_access"
-#       direction = "ingress"
-#       protocol  = "tcp"
-#       action    = var.actions_ssh_admin
-#       destination_ip_address = module.admin_vm.internal_ip
-#       destination_port       = "2025"
-#     },
-#     {
-#       name = "http_access"
-#       direction = "ingress"
-#       protocol  = "tcp"
-#       action    = "allow"
-#       destination_ip_address = module.loadbalancer.loadbalancer_vip_address
-#       destination_port       = "80"
-#     },
-#     {
-#       name = "internal_access"
-#       direction = "egress"
-#       protocol  = "any"
-#       action    = "allow"
-#       source_ip_address = "0.0.0.0/0"
-#       # source_ip_address = "10.1.1.0/24"
-#     }
-#   ]
-
-#   fw_policy = [
-#     {
-#       name  = "ingress_policy"
-#       rules = ["ssh_access", "http_access"]
-#     },
-#     {
-#       name  = "egress_policy"
-#       rules = ["internal_access"]
-#     }
-#   ]
-
-#   ingress_firewall_policy_id = "ingress_policy"
-#   egress_firewall_policy_id  = "egress_policy"
-
-#   ports = compact([
-#     module.admin_vm.port_id,
-#     # module.loadbalancer.lb_port_id
-#   ])
-
-#   depends_on = [
-#     module.router,
-#     module.admin_vm,
-#     module.loadbalancer
-#   ]
-# }
-
-
-
 module "firewall" {
   source = "./modules/firewall"
 

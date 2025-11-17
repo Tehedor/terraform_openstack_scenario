@@ -18,6 +18,6 @@
 # user_data_file         = "${path.module}/cloud-init.tpl"
 
 # db_host = "mysql.internal"
-db_user = "webuser"
-db_pass = "secretpassword"
+db_user = "userdb"
+db_pass = "xxxx"
 db_name = "usuarios_db"
