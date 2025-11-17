@@ -193,19 +193,14 @@ destroy-firewall: init
 
 
 # ---------------------------------------------------------
-# Create grpah
+# Create graph
 # ---------------------------------------------------------
-.PHONY: graph extract_key cp_keyhost
+.PHONY: graph extract_key ssh_deny ssh_allow sshAdmin 
 
 graph:  
 	@echo "🖼️  Generando graph.png (terraform graph -> dot)..."
 	@terraform graph | dot -Tpng -o graph.png
 	@echo "✅ graph.png creado en $(PWD)/graph.png"
-
-
-vip_ip:
-	@echo "🔎 Obteniendo VIP del Load Balancer..."
-	@terraform state show 'module.loadbalancer.openstack_lb_loadbalancer_v2.loadBalancer' | grep vip_address || true
 
 
 # ---------------------------------------------------------
