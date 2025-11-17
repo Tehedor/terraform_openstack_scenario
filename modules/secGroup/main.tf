@@ -21,6 +21,6 @@ resource "openstack_networking_secgroup_rule_v2" "security_group_rule" {
   remote_ip_prefix  = var.security_group_rules[count.index].remote_ip_prefix
   security_group_id = openstack_networking_secgroup_v2.my_security_group.id
 
-  port_range_min    = lookup(var.security_group_rules[count.index], "port_range_min", null)
-  port_range_max    = lookup(var.security_group_rules[count.index], "port_range_max", null)
+  port_range_min = lookup(var.security_group_rules[count.index], "port_range_min", null)
+  port_range_max = lookup(var.security_group_rules[count.index], "port_range_max", null)
 }

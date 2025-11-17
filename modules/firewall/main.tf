@@ -11,9 +11,9 @@ terraform {
 resource "openstack_fw_rule_v2" "rule" {
   count = length(var.fw_rules)
 
-  name      = lookup(var.fw_rules[count.index], "name", "default_rule_name")
-  protocol  = lookup(var.fw_rules[count.index], "protocol", "any")
-  action    = lookup(var.fw_rules[count.index], "action", "allow")
+  name     = lookup(var.fw_rules[count.index], "name", "default_rule_name")
+  protocol = lookup(var.fw_rules[count.index], "protocol", "any")
+  action   = lookup(var.fw_rules[count.index], "action", "allow")
 
   destination_ip_address = lookup(var.fw_rules[count.index], "destination_ip_address", null)
   destination_port       = lookup(var.fw_rules[count.index], "destination_port", null)

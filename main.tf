@@ -4,16 +4,16 @@
 # 0. FLAVORS
 # ---------------------------------------------------------
 module "flavor_db" {
-  source = "./modules/flavor"  # Directorio donde tienes el módulo de flavor
+  source = "./modules/flavor" # Directorio donde tienes el módulo de flavor
 
   # Parámetros del flavor
-  name       = "m1.db_1gb"
-  ram        = 1024    # 1 GB
-  vcpus      = 1
-  disk       = 10
-  swap       = 0
-  ephemeral  = 0
-  is_public  = true
+  name        = "m1.db_1gb"
+  ram         = 1024 # 1 GB
+  vcpus       = 1
+  disk        = 10
+  swap        = 0
+  ephemeral   = 0
+  is_public   = true
   extra_specs = {}
 
   # Datos de autenticación OpenStack
@@ -71,18 +71,37 @@ module "security_group" {
   # description = "An example security group for demonstration purposes"
 
   security_group_rules = [
-    {
+   {
       direction        = "ingress"
       ethertype        = "IPv4"
       protocol         = "tcp"
       remote_ip_prefix = "0.0.0.0/0"
-    },{
-      direction        = "ingress"          # Entrada al servidor
-      ethertype        = "IPv4"             # Protocolo IPv4
-      protocol         = "tcp"              # MySQL usa TCP
-      port_range_min   = 3306               # Puerto inicial (3306)
-      port_range_max   = 3306               # Puerto final (3306)
-      remote_ip_prefix = "0.0.0.0/0"        # Permite la conexión desde cualquier IP
+    },
+    {
+      direction        = "egress"
+      ethertype        = "IPv4"
+      protocol         = "tcp"
+      remote_ip_prefix = "0.0.0.0/0"
+    },
+    {
+      direction        = "ingress"
+      ethertype        = "IPv4"
+      protocol         = "udp"
+      remote_ip_prefix = "0.0.0.0/0"
+    },
+    {
+      direction        = "egress"
+      ethertype        = "IPv4"
+      protocol         = "udp"
+      remote_ip_prefix = "0.0.0.0/0"
+    },
+    {
+      direction        = "ingress"   # Entrada al servidor
+      ethertype        = "IPv4"      # Protocolo IPv4
+      protocol         = "tcp"       # MySQL usa TCP
+      port_range_min   = 3306        # Puerto inicial (3306)
+      port_range_max   = 3306        # Puerto final (3306)
+      remote_ip_prefix = "0.0.0.0/0" # Permite la conexión desde cualquier IP
       # **NOTA DE SEGURIDAD:** # Considera reemplazar "0.0.0.0/0" por la IP o el CIDR de tus servidores de aplicación 
       # para mayor seguridad. Por ejemplo: "192 .168.1.10/32".
     }
@@ -157,9 +176,9 @@ module "backup_router" {
 module "db_bbdd" {
   source = "./modules/vm_instance"
 
-  name   = "BBDD"
-  image  = var.image_base_name
-  flavor = module.flavor_db.flavor_name
+  name            = "BBDD"
+  image           = var.image_base_name
+  flavor          = module.flavor_db.flavor_name
   security_groups = [module.security_group.security_group_id]
   # key_pair = var.key_pair_name
   # key_pair = ""
@@ -172,11 +191,11 @@ module "db_bbdd" {
   assign_floating_ip = false # BBDD no tiene salida a Internet/IP flotante [cite: 51]
 
 
-  db_user = var.db_user
-  db_pass = var.db_pass
-  db_name = var.db_name
+  db_user                = var.db_user
+  db_pass                = var.db_pass
+  db_name                = var.db_name
   asign_multiple_network = true
-  second_network_id      = module.networking3[0].network_id  
+  second_network_id      = module.networking3[0].network_id
 
   # No explicit depends_on needed: module references create the necessary dependency.
 }
@@ -193,7 +212,7 @@ module "object_storage" {
 
   network_id             = module.networking2.network_id # Conectado a Net2
   asign_multiple_network = true
-  second_network_id      = module.networking3[0].network_id  
+  second_network_id      = module.networking3[0].network_id
 
 
   # Configuraciones específicas
@@ -209,11 +228,11 @@ module "object_storage" {
 module "admin_vm" {
   source = "./modules/vm_instance"
 
-  name            = "ADMIN"
-  image           = var.image_base_name
-  flavor          = var.flavor_web
+  name   = "ADMIN"
+  image  = var.image_base_name
+  flavor = var.flavor_web
 
-  create_keypair = true
+  create_keypair  = true
   key_pair        = var.key_pair_name
   security_groups = [module.security_group.security_group_id]
   # security_groups = [openstack_networking_secgroup_v2.my_security_group.id]
@@ -252,9 +271,10 @@ module "web" {
 
   count = 3
 
-  name   = "s${count.index + 1}"
-  image  = var.image_base_name
-  flavor = var.flavor_web
+  name            = "s${count.index + 1}"
+  image           = var.image_base_name
+  # flavor          = var.flavor_web
+  flavor = module.flavor_db.flavor_name
   security_groups = [module.security_group.security_group_id]
 
 
@@ -370,9 +390,6 @@ module "loadbalancer" {
 # }
 
 
-
-
-
 # module "firewall" {
 #   source = "./modules/firewall"
 
@@ -398,8 +415,8 @@ module "loadbalancer" {
 #       direction = "egress"
 #       protocol  = "any"
 #       action    = "allow"
-#       # source_ip_address = "0.0.0.0/0"
-#       source_ip_address = "10.1.1.0/24"
+#       source_ip_address = "0.0.0.0/0"
+#       # source_ip_address = "10.1.1.0/24"
 #     }
 #   ]
 
@@ -428,3 +445,65 @@ module "loadbalancer" {
 #     module.loadbalancer
 #   ]
 # }
+
+
+
+module "firewall" {
+  source = "./modules/firewall"
+
+  ### REGLA SSH (EXTERIOR → ADMIN)
+  fw_rules = [
+    {
+      name                   = "ssh_access"
+      direction              = "ingress"
+      protocol               = "tcp"
+      action                 = var.actions_ssh_admin
+      destination_ip_address = module.admin_vm.internal_ip
+      destination_port       = "2025"
+    },
+
+    ### REGLA HTTP (EXTERIOR → LB)
+    {
+      name                   = "http_access"
+      direction              = "ingress"
+      protocol               = "tcp"
+      action                 = "allow"
+      destination_ip_address = module.loadbalancer.loadbalancer_vip_address
+      destination_port       = "80"
+    },
+
+    ### REGLA EGRESS (INTERIOR → CUALQUIERA)
+    {
+      name              = "internal_access"
+      direction         = "egress"
+      protocol          = "any"
+      action            = "allow"
+      source_ip_address = var.net1_cidr
+    }
+  ]
+
+  fw_policy = [
+    {
+      name  = "ingress_policy"
+      rules = ["ssh_access", "http_access"]
+    },
+    {
+      name  = "egress_policy"
+      rules = ["internal_access"]
+    }
+  ]
+
+  ingress_firewall_policy_id = "ingress_policy"
+  egress_firewall_policy_id  = "egress_policy"
+
+  ### PUERTOS DONDE SE APLICA EL FIREWALL
+  ports = [
+    module.router.router_port_id 
+  ]
+
+  depends_on = [
+    module.router,
+    module.admin_vm,
+    module.loadbalancer
+  ]
+}

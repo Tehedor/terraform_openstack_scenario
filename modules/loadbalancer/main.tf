@@ -46,7 +46,7 @@ resource "openstack_networking_floatingip_v2" "fip" {
 
 # # Asocia la Floating IP a la instancia
 resource "openstack_networking_floatingip_associate_v2" "fip_assoc" {
-  count         = var.assign_floating_ip ? 1 : 0
+  count       = var.assign_floating_ip ? 1 : 0
   floating_ip = openstack_networking_floatingip_v2.fip[0].address
-  port_id       = openstack_lb_loadbalancer_v2.loadBalancer.vip_port_id
+  port_id     = openstack_lb_loadbalancer_v2.loadBalancer.vip_port_id
 }

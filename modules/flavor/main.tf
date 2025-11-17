@@ -8,11 +8,11 @@ terraform {
 }
 
 resource "openstack_compute_flavor_v2" "custom_flavor" {
-  name   = var.name
-  ram    = var.ram       # en MB
-  vcpus  = var.vcpus
-  disk   = var.disk      # disco raíz en GB
-  swap   = var.swap      # swap en MB
+  name      = var.name
+  ram       = var.ram # en MB
+  vcpus     = var.vcpus
+  disk      = var.disk # disco raíz en GB
+  swap      = var.swap # swap en MB
   ephemeral = var.ephemeral
   is_public = var.is_public
 
