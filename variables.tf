@@ -1,6 +1,3 @@
-# ---------------------------------------------------------
-# Variables VM instances
-# ---------------------------------------------------------
 variable "image_base_name" {
   description = "Nombre de la imagen base de Ubuntu cloud-img (ej: jammy-server-cloudimg-amd64-vnx)"
   type        = string

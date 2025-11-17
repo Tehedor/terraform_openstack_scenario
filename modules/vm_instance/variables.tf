@@ -1,5 +1,3 @@
-# ./modules/vm_instance/variables.tf
-
 variable "name" {
   description = "Nombre de la instancia de la máquina virtual (ej: 'ADMIN' o 's1')"
   type        = string
@@ -67,11 +65,6 @@ variable "asign_multiple_network" {
   default     = false
 }
 
-
-
-
-
-# Base de datos contraseña
 variable "db_host" {
   type        = string
   default     = null
@@ -109,4 +102,3 @@ variable "ip_address" {
   type        = string
   default     = ""
 }
-

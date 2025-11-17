@@ -28,6 +28,12 @@ help:
 		&& echo "  deploy-firewall      - Desplegar Firewall (module.firewall)" \
 		&& echo "  deploy_all           - Ejecutar check y aplicar toda la infraestructura" \
 		&& echo "" \
+		&& echo "KEYS & SSH:" \
+		&& echo "  extract_key          - Extrae la clave privada admin a ./keys/admin_key.pem" \
+		&& echo "  ssh_deny             - Denegar acceso SSH al ADMIN (apply var actions_ssh_admin=deny)" \
+		&& echo "  ssh_allow            - Permitir acceso SSH al ADMIN (apply var actions_ssh_admin=allow)" \
+		&& echo "  sshAdmin             - Conectar por SSH al servidor ADMIN usando la clave privada ./keys/admin_key.pem" \
+		&& echo "" \
 		&& echo "DESTRUCCIÓN (targets):" \
 		&& echo "  destroy-networking   - Destruir redes y router (module.router, networking2, networking)" \
 		&& echo "  destroy-admin        - Destruir ADMIN (module.admin_vm)" \
@@ -201,14 +207,16 @@ vip_ip:
 	@echo "🔎 Obteniendo VIP del Load Balancer..."
 	@terraform state show 'module.loadbalancer.openstack_lb_loadbalancer_v2.loadBalancer' | grep vip_address || true
 
+
+# ---------------------------------------------------------
+# KEYS & SSH
+# ---------------------------------------------------------
 extract_key:
 	@echo "🔑 Extrayendo la clave privada del keypair..."
 	@terraform output -raw admin_key_private > ./keys/admin_key.pem
-# 	@terraform output -raw module.admin_vm.private_key > ./keys/my_key.pem
-	@chmod 666 ./keys/admin_key.pem
-# 	@terraform output -raw admin_ssh_ip > ./keys/admin_ssh_ip.txt
-	@printf 'export admin_ip="%s"\n' "$$(terraform output -raw admin_ssh_ip)" > ./keys/admin_ssh_ip.sh
-	@echo "✅ Clave privada guardada en ./keys/my_key.pem"
+	@chmod 600 ./keys/admin_key.pem || true
+	@printf 'export admin_ip="%s"\n' "$$(terraform output -raw admin_ssh_ip)" > ./keys/admin_ssh_ip.sh || true
+	@echo "✅ Clave privada guardada en ./keys/admin_key.pem"
 
 ssh_deny:
 	@echo "🚫 Denegando acceso SSH al servidor ADMIN..."
@@ -220,8 +228,10 @@ ssh_allow:
 	@terraform apply -auto-approve -var="actions_ssh_admin=allow"
 	@echo "✅ Acceso SSH permitido."
 
-cp_keyhost:
-	@cp -r /mnt/tmp/openstack_lab-antelope_4n_classic_ovs-v04/shared/keys/* ./keys/
+sshAdmin:
+	@echo "🔧 Configurando acceso SSH al servidor ADMIN..."
+	@source ./keys/admin_ssh_ip.sh && ssh -i keys/admin_key.pem root@${admin_ip}
+	@echo "✅ Acceso SSH configurado."
 
 
 # ---------------------------------------------------------
@@ -245,6 +255,7 @@ run_problem_terraform:
 	@echo "Iniciando resolución de problemas de Terraform en el laboratorio..."
 	@cd /mnt/tmp/openstack_lab-antelope_4n_classic_ovs-v04 && \
 	sudo vnx -f openstack_lab-terraform.xml -x install-terraform
+
 
 destroy_nodes:
 	@cd /mnt/tmp/openstack_lab-antelope_4n_classic_ovs-v04 && \

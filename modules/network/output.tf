@@ -1,5 +1,3 @@
-# ./modules/network/output.tf
-
 output "network_id" {
   description = "ID de la red creada, necesaria para conectar VMs y Routers"
   value       = openstack_networking_network_v2.net.id

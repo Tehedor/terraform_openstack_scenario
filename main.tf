@@ -4,7 +4,7 @@
 # 0. FLAVORS
 # ---------------------------------------------------------
 module "flavor_db_web" {
-  source = "./modules/flavor" # Directorio donde tienes el módulo de flavor
+  source = "./modules/flavor" 
 
   # Parámetros del flavor
   name        = "m1.db_1gb"
@@ -26,8 +26,8 @@ module "flavor_db_web" {
 }
 
 module "flavor_storage" {
-  source = "./modules/flavor" # Directorio donde tienes el módulo de flavor
-
+  source = "./modules/flavor" 
+  
   # Parámetros del flavor
   name        = "m1.storage_1gb"
   ram         = 2048 # 2 GB
@@ -90,7 +90,6 @@ module "security_group" {
   source              = "./modules/secGroup"
   security_group_name = "open"
   description         = "Grupo de Seguridad para permitir todo el trafico"
-  # description = "An example security group for demonstration purposes"
 
   security_group_rules = [
    {
@@ -118,32 +117,6 @@ module "security_group" {
       remote_ip_prefix = "0.0.0.0/0"
     }
   ]
-  # security_group_rules = [
-  #   {
-  #     direction        = "ingress"
-  #     ethertype        = "IPv4"
-  #     protocol         = "tcp"
-  #     remote_ip_prefix = "0.0.0.0/0"
-  #   },
-  #   {
-  #     direction        = "egress"
-  #     ethertype        = "IPv4"
-  #     protocol         = "tcp"
-  #     remote_ip_prefix = "0.0.0.0/0"
-  #   },
-  #   {
-  #     direction        = "ingress"
-  #     ethertype        = "IPv4"
-  #     protocol         = "udp"
-  #     remote_ip_prefix = "0.0.0.0/0"
-  #   },
-  #   {
-  #     direction        = "egress"
-  #     ethertype        = "IPv4"
-  #     protocol         = "udp"
-  #     remote_ip_prefix = "0.0.0.0/0"
-  #   }
-  # ]
 }
 
 
@@ -152,25 +125,16 @@ module "security_group" {
 # ---------------------------------------------------------
 # 3. SERVIDORES
 # ---------------------------------------------------------
-
-
-# Net3: siempre presente; el acceso a Internet se controla con `has_internet`.
 module "networking3" {
   source = "./modules/network"
   count  = 1
-
 
   network_name = "Net3"
   subnet_name  = "subnet3"
   cidr         = var.net3_cidr
   has_internet = var.create_temp_net
-
-  # En tu módulo de subnet asegúrate de exponer dns_nameservers/gateway si lo soporta.
-  # Si tu módulo/network no soporta dns_nameservers/gateway, ver más abajo cómo añadir el recurso openstack_networking_subnet_v2 directamente.
-  # gateway_ip      = cidrhost(var.net3_cidr, 1)
 }
 
-# Router de backup que conecta Net3 a la red externa (ExtNet)
 module "backup_router" {
   source = "./modules/router"
   count  = var.create_temp_net ? 1 : 0
@@ -192,24 +156,19 @@ module "db_bbdd" {
   image           = var.image_base_name
   flavor          = module.flavor_db_web.flavor_name
   security_groups = [module.security_group.security_group_id]
-  # key_pair = var.key_pair_name
-  # key_pair = ""
 
-  network_id = module.networking2.network_id # Conectado a Net2
-  # asign_multiple_network = true
+
+  network_id = module.networking2.network_id 
 
   # Configuraciones específicas
   user_data_file     = "./cloud-init-scripts/db_init.tpl"
-  assign_floating_ip = false # BBDD no tiene salida a Internet/IP flotante [cite: 51]
-
+  assign_floating_ip = false 
 
   db_user                = var.db_user
   db_pass                = var.db_pass
   db_name                = var.db_name
   asign_multiple_network = true
   second_network_id      = module.networking3[0].network_id
-
-  # No explicit depends_on needed: module references create the necessary dependency.
 }
 
 module "object_storage" {
@@ -218,21 +177,17 @@ module "object_storage" {
   name   = "ObjectStorage"
   image  = var.image_base_name
   flavor = module.flavor_storage.flavor_name
-  # key_pair = var.key_pair_name
-  # key_pair = ""
   security_groups = [module.security_group.security_group_id]
 
-  network_id             = module.networking2.network_id # Conectado a Net2
+  network_id             = module.networking2.network_id 
   asign_multiple_network = true
   second_network_id      = module.networking3[0].network_id
 
-
   # Configuraciones específicas
   user_data_file     = "./cloud-init-scripts/object_storage_init.tpl"
-  assign_floating_ip = false # BBDD no tiene salida a Internet/IP flotante [cite: 51]
-
-  # No explicit depends_on needed: module references create the necessary dependency.
+  assign_floating_ip = false 
 }
+
 # ---------------------------------------------------------
 # 4. SERVIDORES
 # ---------------------------------------------------------
@@ -247,17 +202,16 @@ module "admin_vm" {
   create_keypair  = true
   key_pair        = var.key_pair_name
   security_groups = [module.security_group.security_group_id]
-  # security_groups = [openstack_networking_secgroup_v2.my_security_group.id]
 
   network_id             = module.networking.network_id # Conectado a Net1
   asign_multiple_network = true
-  second_network_id      = module.networking2.network_id # Conectado a Net2
+  second_network_id      = module.networking2.network_id 
 
   # Configuración específica de ADMIN
   user_data_file     = "./cloud-init-scripts/admin_init.tpl"
-  assign_floating_ip = true # Requisito: ADMIN tendrá IP flotante [cite: 79]
-  ssh_port           = 2025 # Requisito: Puerto SSH personalizado [cite: 149, 150]
-}
+  assign_floating_ip = true 
+  ssh_port           = 2025 
+  }
 
 module "web" {
   source = "./modules/vm_instance"
@@ -266,7 +220,6 @@ module "web" {
 
   name            = "s${count.index + 1}"
   image           = var.image_base_name
-  # flavor          = var.flavor_web
   flavor = module.flavor_db_web.flavor_name
   security_groups = [module.security_group.security_group_id]
 
@@ -367,7 +320,6 @@ module "firewall" {
   ingress_firewall_policy_id = "ingress_policy"
   egress_firewall_policy_id  = "egress_policy"
 
-  ### PUERTOS DONDE SE APLICA EL FIREWALL
   ports = [
     module.router.router_port_id 
   ]

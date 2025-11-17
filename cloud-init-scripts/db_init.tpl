@@ -44,17 +44,11 @@ write_files:
       ('admin', 'admin@gmail.com');
 
 runcmd:
-
-
-  # Configurar bind-address antes de arrancar MySQL
   - sed -i "s/^bind-address.*/bind-address = 0.0.0.0/" /etc/mysql/mysql.conf.d/mysqld.cnf
 
-  # Arrancar MySQL
+  - systemctl daemon-reload
+  - systemctl restart mysql
   - systemctl enable mysql
   - systemctl start mysql
 
-  # Espera que MySQL esté completamente estable
-  - sleep 10
-
-  # Ejecutar inicialización mínima después de que MySQL esté listo
   - /root/init-db.sh

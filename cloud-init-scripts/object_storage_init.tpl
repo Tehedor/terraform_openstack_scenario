@@ -1,6 +1,4 @@
 #cloud-config
-# minioadmin/minioadmin
-# http://<IP_DEL_SERVIDOR>:9000/images/image.jpg
 package_update: true
 packages:
   - wget

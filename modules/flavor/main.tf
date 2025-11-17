@@ -9,13 +9,12 @@ terraform {
 
 resource "openstack_compute_flavor_v2" "custom_flavor" {
   name      = var.name
-  ram       = var.ram # en MB
+  ram       = var.ram 
   vcpus     = var.vcpus
-  disk      = var.disk # disco raíz en GB
-  swap      = var.swap # swap en MB
+  disk      = var.disk
+  swap      = var.swap 
   ephemeral = var.ephemeral
   is_public = var.is_public
 
-  # Opcional: especificar extra_specs si quieres
   extra_specs = var.extra_specs
 }
