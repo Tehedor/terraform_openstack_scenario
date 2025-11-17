@@ -26,6 +26,7 @@ variable "protocol_port" {
 variable "lb_method" {
   description = "Método de balanceo de carga (ROUND_ROBIN, LEAST_CONNECTIONS, etc.)"
   type        = string
+  default = "ROUND_ROBIN"
 }
 
 variable "num_servers" {

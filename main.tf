@@ -29,8 +29,8 @@ module "flavor_storage" {
   source = "./modules/flavor" 
   
   # Parámetros del flavor
-  name        = "m1.storage_1gb"
-  ram         = 2048 # 2 GB
+  name        = "m1.storage_2.5gb"
+  ram         = 2500 # 2.5 GB
   vcpus       = 1
   disk        = 10
   swap        = 0
