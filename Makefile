@@ -241,9 +241,10 @@ deploy_numb_web_servers:
 	    exit 1; \
 	  fi; \
 	fi; \
-	@echo "🚀 Desplegando $$num servidores web..."; \
-	@terraform apply -auto-approve -var="web_servers_count=$$num"; \
-	@echo "✅ Despliegue de $$num servidores web completado."
+	echo "🚀 Desplegando $$num servidores web..."; \
+	terraform apply -auto-approve -var="web_servers_count=$$num"; \
+	echo "✅ Despliegue de $$num servidores web completado."
+
 
 # catch-all para evitar error cuando pasas el número como segundo objetivo
 %:
