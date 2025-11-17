@@ -7,8 +7,8 @@ module "flavor_db_web" {
   source = "./modules/flavor" 
 
   # Parámetros del flavor
-  name        = "m1.db_1gb"
-  ram         = 1024 # 1 GB
+  name        = "m1.db_web_2gb"
+  ram         = 2048 # 2 GB
   vcpus       = 1
   disk        = 10
   swap        = 0
@@ -29,8 +29,8 @@ module "flavor_storage" {
   source = "./modules/flavor" 
   
   # Parámetros del flavor
-  name        = "m1.storage_2.5gb"
-  ram         = 2500 # 2.5 GB
+  name        = "m1.storage_4gb"
+  ram         = 4096 # 4 GB
   vcpus       = 1
   disk        = 10
   swap        = 0
@@ -306,6 +306,7 @@ module "firewall" {
     }
   ]
 
+  # Policies fw
   fw_policy = [
     {
       name  = "ingress_policy"
@@ -317,6 +318,7 @@ module "firewall" {
     }
   ]
 
+  # Group fw 
   ingress_firewall_policy_id = "ingress_policy"
   egress_firewall_policy_id  = "egress_policy"
 
