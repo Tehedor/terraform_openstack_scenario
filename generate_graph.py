@@ -199,17 +199,28 @@ def generate_png_from_dot(dot_code, output_filename="terraform_graph.png"):
 # --- 3. Ejecución Principal ---
 
 def main():
-    # Soporta un argumento: 'png' (por defecto) o 'dot'
+    # Parse simple arguments.
+    # Uso: generate_graph.py [png|dot] [--preserve-labels|-p]
+    args = sys.argv[1:]
     mode = 'png'
-    if len(sys.argv) > 1:
-        arg = sys.argv[1].lower()
-        if arg in ('png', 'dot'):
-            mode = arg
-        else:
-            print("Uso: generate_graph.py [png|dot]")
-            print("  png - generar imagen PNG (default)")
-            print("  dot - guardar la salida DOT cruda de 'terraform graph' en 'terraform_graph_raw.dot'")
-            sys.exit(1)
+    preserve_labels = False
+
+    # Collect mode if present
+    for a in list(args):
+        la = a.lower()
+        if la in ('png', 'dot'):
+            mode = la
+            args.remove(a)
+        elif la in ('--preserve-labels', '-p'):
+            preserve_labels = True
+            args.remove(a)
+
+    if args:
+        print("Uso: generate_graph.py [png|dot] [--preserve-labels|-p]")
+        print("  png - generar imagen PNG (default)")
+        print("  dot - guardar la salida DOT formateado en 'terraform_graph_styled.dot'")
+        print("  --preserve-labels, -p - no acortar/compactar las etiquetas de los nodos (mantiene la información original)")
+        sys.exit(1)
 
     # 1. Obtener el DOT en crudo de Terraform
     raw_dot_string = get_terraform_graph()
@@ -219,8 +230,12 @@ def main():
         sys.exit(1) # Salir con código de error
 
     # Aplicar transformaciones (labels, estilos, coloreado)
-    print("2. Acortando etiquetas de nodos...")
-    modified_dot = shorten_node_labels(raw_dot_string)
+    if not preserve_labels:
+        print("2. Acortando etiquetas de nodos...")
+        modified_dot = shorten_node_labels(raw_dot_string)
+    else:
+        print("2. Manteniendo etiquetas originales (preserve-labels)")
+        modified_dot = raw_dot_string
 
     print("3. Inyectando estilos globales...")
     modified_dot = inject_global_styles(modified_dot)
