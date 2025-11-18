@@ -40,7 +40,7 @@ GLOBAL_STYLES = textwrap.dedent("""
         shape = "box",
         style = "filled,rounded",
         fontname = "sans-serif",
-        fontsize = 10,
+        fontsize = 20,
         fillcolor = "white", /* <-- Nodos siempre blancos */
         color = "#444444",
         penwidth = 1.5
@@ -58,7 +58,7 @@ GLOBAL_STYLES = textwrap.dedent("""
     graph [
         style = "filled,rounded",
         fontname = "sans-serif",
-        fontsize = 12,
+        fontsize = 30,
         penwidth = 1.5,
         fillcolor = "#F9F9F9", 
         color = "#BBBBBB"
